@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+   :root {
+      --radius: 0.5rem;
+   }
+}
+
+* {
+   scroll-behavior: smooth;
+}
+
+@layer components {
+   .hover-underline {
+      @apply relative inline-block text-white;
+   }
+
+   .hover-underline::after {
+      @apply absolute -bottom-1 left-0 h-1 w-full origin-bottom-right scale-x-0 bg-white transition-transform duration-300 ease-out content-[''] hover:origin-bottom-left hover:scale-x-100;
+   }
+
+   .hover-underline.active::after {
+      @apply scale-x-100;
+   }
+
+   .card-about {
+      @apply flex cursor-pointer flex-col items-center justify-center rounded bg-gray-400/30 px-5 py-5 backdrop-blur-lg transition-colors hover:bg-gray-600/70;
+   }
+}
