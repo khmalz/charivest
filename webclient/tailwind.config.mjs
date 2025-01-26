@@ -9,20 +9,14 @@ export default {
          padding: {
             DEFAULT: "1rem",
             sm: "2rem",
-            lg: "4rem",
-            xl: "5rem",
-            "2xl": "6rem",
          },
       },
       extend: {
          colors: {
-            background: "var(--background)",
-            foreground: "var(--foreground)",
-         },
-         borderRadius: {
-            lg: "var(--radius)",
-            md: "calc(var(--radius) - 2px)",
-            sm: "calc(var(--radius) - 4px)",
+            primary: "#213555",
+            secondary: "#3E5879",
+            tertiary: "#D8C4B6",
+            quaternary: "#F5EFE7",
          },
       },
    },
