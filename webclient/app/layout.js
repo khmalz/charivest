@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
          <head>
             <ThemeModeScript />
          </head>
-         <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased bg-slate-100 dark:bg-primary mb-10`}>
+         <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased bg-slate-300/50 dark:bg-primary mb-10`}>
             <Nav />
             <Flowbite>
                <div className="container">{children}</div>
