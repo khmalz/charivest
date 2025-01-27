@@ -1,6 +1,7 @@
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/ui/Nav";
+import { Flowbite, ThemeModeScript } from "flowbite-react";
 
 const robotoSans = Roboto({
    weight: ["100", "400", "500", "900"],
@@ -21,10 +22,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
    return (
-      <html lang="en">
-         <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased bg-primary mb-10`}>
+      <html lang="en" suppressHydrationWarning>
+         <head>
+            <ThemeModeScript />
+         </head>
+         <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased bg-slate-100 dark:bg-primary mb-10`}>
             <Nav />
-            <div className="container">{children}</div>
+            <Flowbite>
+               <div className="container">{children}</div>
+            </Flowbite>
          </body>
       </html>
    );

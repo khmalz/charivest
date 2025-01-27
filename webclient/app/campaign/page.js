@@ -51,7 +51,7 @@ export default function Campaign() {
    return (
       <div>
          <section id="create">
-            <h2 className="text-center text-2xl font-bold text-white sm:text-3xl mt-24">Create Campaign</h2>
+            <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl mt-24">Create Campaign</h2>
 
             <div className="flex justify-center">
                <div className="w-full max-w-3xl p-3">
@@ -60,26 +60,26 @@ export default function Campaign() {
                         <div className="grid grid-cols-2 space-x-2">
                            <div>
                               <div className="mb-2 block">
-                                 <Label htmlFor="title" className="text-white" value="Title" />
+                                 <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
                               </div>
                               <TextInput id="title" type="text" />
                            </div>
                            <div>
                               <div className="mb-2 block">
-                                 <Label htmlFor="deadline" className="text-white" value="Deadline" />
+                                 <Label htmlFor="deadline" className="dark:text-white text-slate-800" value="Deadline" />
                               </div>
                               <Datepicker language="id-ID" theme={datepickerTheme} labelTodayButton="Hari Ini" labelClearButton="Clear" minDate={new Date()} />
                            </div>
                         </div>
                         <div className="max-w-full">
                            <div className="mb-2 block">
-                              <Label htmlFor="description" value="Description" className="text-white" />
+                              <Label htmlFor="description" value="Description" className="dark:text-white text-slate-800" />
                            </div>
                            <Textarea id="description" placeholder="Leave a description..." required rows={4} />
                         </div>
                         <div>
                            <div className="mb-2 block">
-                              <Label htmlFor="image" value="Image" className="text-white" />
+                              <Label htmlFor="image" value="Image" className="dark:text-white text-slate-800" />
                            </div>
 
                            <DropzoneInput onDrop={onDrop} />

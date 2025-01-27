@@ -18,11 +18,11 @@ body {
 
 @layer components {
    .hover-underline {
-      @apply relative inline-block text-white;
+      @apply relative inline-block text-primary hover:!text-primary dark:!text-white dark:md:hover:!text-white;
    }
 
    .hover-underline::after {
-      @apply absolute -bottom-1 left-0 h-1 w-full origin-bottom-right scale-x-0 bg-white transition-transform duration-300 ease-out content-[''] hover:origin-bottom-left hover:scale-x-100;
+      @apply absolute -bottom-1 left-0 h-1 w-full origin-bottom-right scale-x-0 bg-primary dark:!bg-white transition-transform duration-300 ease-out content-[''] hover:origin-bottom-left hover:scale-x-100;
    }
 
    .hover-underline.active::after {
