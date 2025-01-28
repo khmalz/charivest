@@ -4,9 +4,44 @@ import { Button, DarkThemeToggle, Dropdown, Navbar, Popover } from "flowbite-rea
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CircleUser } from "lucide-react";
+import { useCallback, useState } from "react";
+import { useSDK } from "@metamask/sdk-react";
+import { formatAddress } from "@/helpers/utils";
+import { ethers } from "ethers";
 
 export default function Nav() {
-   const isLogin = false;
+   const [accountData, setAccountData] = useState({
+      address: "",
+      balance: 0,
+   });
+   const { sdk, connected, connecting } = useSDK();
+
+   const connect = async () => {
+      try {
+         const accounts = await sdk?.connect();
+         const address = accounts?.[0];
+
+         const balance = await window.ethereum.request({
+            method: "eth_getBalance",
+            params: [address, "latest"],
+         });
+
+         setAccountData({
+            address,
+            balance: ethers.formatEther(balance),
+         });
+
+         console.log("Connected to MetaMask");
+      } catch (err) {
+         console.error("Error connecting to MetaMask:", err);
+      }
+   };
+
+   const disconnect = () => {
+      if (sdk) {
+         sdk.terminate();
+      }
+   };
 
    const navLink = [
       { text: "Home", link: "/" },
@@ -38,22 +73,23 @@ export default function Nav() {
                ))}
             </Navbar.Collapse>
          </div>
-         <div className={`flex md:order-2 space-x-4 ${!isLogin && "md:space-x-2"}`}>
+         <div className={`flex md:order-2 space-x-4 ${!connected && "md:space-x-2"}`}>
             <Popover content={contentPopover} trigger="hover">
                <DarkThemeToggle className="focus:ring-1" />
             </Popover>
 
-            {isLogin ? (
+            {connected ? (
                <Dropdown arrowIcon={false} inline label={<CircleUser className="text-gray-500 dark:text-gray-400" />}>
                   <Dropdown.Header>
-                     <span className="block text-sm">Bonnie Green</span>
+                     <span className="block text-sm">{formatAddress(accountData.address)}</span>
                   </Dropdown.Header>
+                  <Dropdown.Item>{accountData.balance}</Dropdown.Item>
                   <Dropdown.Item>Dashboard</Dropdown.Item>
-                  <Dropdown.Item>Sign out</Dropdown.Item>
+                  <Dropdown.Item onClick={disconnect}>Sign out</Dropdown.Item>
                </Dropdown>
             ) : (
-               <Button size="xs" className="!text-white dark:bg-amber-700 hidden md:block dark:hover:!bg-amber-800">
-                  <span className="lg:text-sm">Connect with E-wallet</span>
+               <Button size="xs" onClick={connect} disabled={connecting} className="!text-white dark:bg-amber-700 hidden md:block dark:hover:!bg-amber-800 focus:ring-1 dark:focus:bg-amber-700">
+                  <span className="lg:text-sm">Connect with E-wallet {connected}</span>
                </Button>
             )}
             <Navbar.Toggle className="dark:!text-gray-400 hover:bg-opacity-5 focus:ring-1" />
@@ -64,7 +100,7 @@ export default function Nav() {
                   {item.text}
                </Navbar.Link>
             ))}
-            <Button size="sm" className="!text-white dark:bg-amber-700 dark:hover:!bg-amber-800 mt-2">
+            <Button size="sm" className="!text-white dark:bg-amber-700 dark:hover:!bg-amber-800 mt-2 focus:ring-1 dark:focus:bg-amber-700">
                Connect with E-wallet
             </Button>
          </Navbar.Collapse>
