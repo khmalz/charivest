@@ -1,5 +1,5 @@
 import { Button, Progress } from "flowbite-react";
-import { BadgeDollarSign } from "lucide-react";
+import { BadgeDollarSign, Mail, SmartphoneNfc } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -55,7 +55,7 @@ export default function Home() {
 
          <section id="campaign" className="mt-20 md:mt-0">
             <div className="flex flex-col">
-               <h3 className="text-center text-2xl font-bold dark:text-white sm:text-4xl md:text-5xl">Campaign List</h3>
+               <h3 className="text-center text-2xl font-bold dark:text-white sm:text-4xl">Campaign List</h3>
 
                <div className="mt-14 grid grid-cols-1 gap-4 mx-auto md:grid-cols-2 xl:grid-cols-3">
                   {campaigns.slice(0, 3).map(item => (
@@ -101,6 +101,31 @@ export default function Home() {
                <Button size="lg" color="info" as={Link} href="/campaign" className="mx-auto mt-5 text-center dark:hover:!bg-cyan-700 hover:!bg-cyan-800">
                   More
                </Button>
+            </div>
+         </section>
+
+         <section id="contact" className="py-5 md:py-10 lg:scroll-py-14">
+            <h1 className="md:text-2xl xl:text-5xl font-semibold">Contact</h1>
+            <p className="mt-4 text-sm mb-10">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo aliquam dignissimos provident, recusandae tempora laboriosam.</p>
+
+            <div className="mt-5 space-y-8">
+               <div className="flex items-center gap-4">
+                  <Mail className="h-7 w-7 text-gray-700 dark:text-gray-300/50" />
+                  <div>
+                     <a href="mailto:example@example.com" className="text-sm hover:underline">
+                        example@example.com
+                     </a>
+                  </div>
+               </div>
+
+               <div className="flex items-center gap-4">
+                  <SmartphoneNfc className="h-7 w-7 text-gray-700 dark:text-gray-300/50" />
+                  <div>
+                     <a href="tel:088888888888" className="text-sm hover:underline">
+                        088-888-8888
+                     </a>
+                  </div>
+               </div>
             </div>
          </section>
       </div>
