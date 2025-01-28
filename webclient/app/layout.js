@@ -2,7 +2,7 @@ import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Flowbite, ThemeModeScript } from "flowbite-react";
 
-const open_SansSans = Open_Sans({
+const open_sans = Open_Sans({
    weight: ["400", "500"],
    subsets: ["latin"],
 });
@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
          <head>
             <ThemeModeScript />
          </head>
-         <body className={`${open_SansSans.className} antialiased`}>
+         <body className={`${open_sans.className} antialiased`}>
             <Flowbite>{children}</Flowbite>
          </body>
       </html>
