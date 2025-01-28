@@ -98,7 +98,7 @@ export default function Home() {
                      </div>
                   ))}
                </div>
-               <Button size="lg" color="info" as={Link} href="/campaign" className="mx-auto mt-5 text-center hover:bg-cyan-800">
+               <Button size="lg" color="info" as={Link} href="/campaign" className="mx-auto mt-5 text-center dark:hover:!bg-cyan-700 hover:!bg-cyan-800">
                   More
                </Button>
             </div>

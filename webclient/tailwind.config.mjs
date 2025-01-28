@@ -15,6 +15,9 @@ export default {
          },
       },
       extend: {
+         fontSize: {
+            xss: "0.5rem",
+         },
          colors: {
             primary: "#213555",
             secondary: "#3E5879",

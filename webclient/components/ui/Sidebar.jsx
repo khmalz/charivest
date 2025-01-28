@@ -18,7 +18,7 @@ function contentSidebar() {
                   Profile
                </Sidebar.Item>
                <Sidebar.Collapse icon={HiViewBoards} label="Campaign">
-                  <Sidebar.Item as={Link} href="/dashboard/campaign" active={pathname == "/dashboard/campaign"}>
+                  <Sidebar.Item as={Link} href="/dashboard/campaign" active={pathname == "/dashboard/campaign" || (pathname.startsWith("/dashboard/campaign/") && !pathname.includes("/create"))}>
                      List Campaign
                   </Sidebar.Item>
                   <Sidebar.Item as={Link} href="/dashboard/campaign/create" active={pathname == "/dashboard/campaign/create"}>
