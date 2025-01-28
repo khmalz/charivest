@@ -16,6 +16,7 @@ contract Crowdfunding {
         uint256 deadline;
         string proofOfFundUse;
         bool proofSubmitted;
+        address[] donors;
     }
 
     mapping(uint256 => Campaign) private campaigns;
@@ -65,6 +66,7 @@ contract Crowdfunding {
         require(block.timestamp <= campaign.deadline, "Campaign has ended");
 
         campaign.totalFunds += msg.value;
+        campaign.donors.push(msg.sender);
 
         if (campaign.totalFunds >= campaign.totalTarget) {
             campaign.isCompleted = true;
@@ -127,7 +129,8 @@ contract Crowdfunding {
             bool isCompleted,
             uint256 deadline,
             string memory proofOfFundUse,
-            bool proofSubmitted
+            bool proofSubmitted,
+            address[] memory donors
         )
     {
         require(campaignId < campaignCount, "Invalid campaign ID");
@@ -141,7 +144,8 @@ contract Crowdfunding {
             campaign.isCompleted,
             campaign.deadline,
             campaign.proofOfFundUse,
-            campaign.proofSubmitted
+            campaign.proofSubmitted,
+            campaign.donors
         );
     }
 }

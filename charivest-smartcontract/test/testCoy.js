@@ -1,33 +1,146 @@
+const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-async function main() {
-  const CrowdfundingFactory = await ethers.getContractFactory("Crowdfunding");
-  const Crowdfunding = await CrowdfundingFactory.attach(
-    "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-  );
+describe("Crowdfunding Contract", function () {
+  let Crowdfunding, crowdfunding, deployer, addr1, addr2;
 
-  const tx = await Crowdfunding.createCampaign(
-    "Kampanye Kocak",
-    "Penggalangan dana untuk orang kocak",
-    1000,
-    [50, 50]
-  );
-  await tx.wait();
-  console.log("Kampanye berhasil kocak!");
+  beforeEach(async function () {
+    [deployer, addr1, addr2] = await ethers.getSigners();
+    Crowdfunding = await ethers.getContractFactory("Crowdfunding");
+    crowdfunding = await Crowdfunding.deploy();
+  });
 
-  const campaignCount = await Crowdfunding.campaignCount();
-  console.log("Jumlah kampanye saat ini:", campaignCount.toString());
+  it("create a campaign", async function () {
+    const title = "Kampanye Koca";
+    const description = "Kampanya untuk orang kocak";
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
 
-  const campaign = await Crowdfunding.campaigns(0);
-  console.log("Detil Kampanye 0:");
-  console.log("Judul:", campaign.title);
-  console.log("Deskripsi:", campaign.description);
-  console.log("Target Total:", campaign.totalTarget.toString());
-  console.log("Jumlah Dana Terkumpul:", campaign.totalFunds.toString());
-  console.log("Status Kampanye Selesai:", campaign.isCompleted);
-}
+    const tx = await crowdfunding.createCampaign(
+      title,
+      description,
+      totalTarget,
+      deadline
+    );
+    await tx.wait();
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
+    const campaigns = await crowdfunding.getCampaigns();
+    expect(campaigns.length).to.equal(1);
+    expect(campaigns[0].title).to.equal(title);
+    expect(campaigns[0].description).to.equal(description);
+  });
+
+  it("donate to a campaign", async function () {
+    const title = "Kampanye Hebat";
+    const description = "Untuk misi sosial";
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+    await crowdfunding.createCampaign(
+      title,
+      description,
+      totalTarget,
+      deadline
+    );
+
+    const donationAmount = ethers.parseEther("0.5");
+    await crowdfunding.connect(addr1).donate(0, { value: donationAmount });
+
+    const campaigns = await crowdfunding.getCampaigns();
+    expect(campaigns[0].totalFunds).to.equal(donationAmount);
+  });
+
+  it("mark a campaign as completed when reach the target", async function () {
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+
+    await crowdfunding.connect(addr1).donate(0, {
+      value: ethers.parseEther("1.0"),
+    });
+
+    const campaigns = await crowdfunding.getCampaigns();
+    expect(campaigns[0].isCompleted).to.equal(true);
+  });
+
+  it("allow proof submission by creator after completion", async function () {
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+
+    await crowdfunding.connect(addr1).donate(0, {
+      value: ethers.parseEther("1.0"),
+    });
+
+    const proofURI = "https://example.com/proof";
+    await crowdfunding.submitProofOfFundUse(0, proofURI);
+
+    const [, , , , , , , proofOfFundUse] = await crowdfunding.getDetailCampaign(
+      0
+    );
+    expect(proofOfFundUse).to.equal(proofURI);
+  });
+
+  it("return reward points", async function () {
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+
+    const donationAmount = ethers.parseEther("0.5");
+    await crowdfunding.connect(addr1).donate(0, { value: donationAmount });
+
+    const rewardPoints = await crowdfunding.getRewardPoints(addr1.address);
+
+    const expectedRewardPoints = BigInt(donationAmount) / BigInt(10);
+
+    expect(rewardPoints).to.equal(expectedRewardPoints);
+  });
+
+  it("revert donation for invalid campaign ID", async function () {
+    await expect(
+      crowdfunding
+        .connect(addr1)
+        .donate(99, { value: ethers.parseEther("0.5") })
+    ).to.be.revertedWith("Invalid campaign ID");
+  });
+
+  it("revert if donation is zero", async function () {
+    await crowdfunding.createCampaign(
+      "Test",
+      "Test",
+      ethers.parseEther("1.0"),
+      Math.floor(Date.now() / 1000) + 60 * 60 * 24
+    );
+
+    await expect(
+      crowdfunding.connect(addr1).donate(0, { value: 0 })
+    ).to.be.revertedWith("Donation must be greater than zero");
+  });
+
+  it("revert if proof submitted after deadline", async function () {
+    const totalTarget = ethers.parseEther("1.0");
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+
+    await crowdfunding.connect(addr1).donate(0, {
+      value: ethers.parseEther("1.0"),
+    });
+
+    const proofURI = "https://example.com/proof";
+
+    const provider = ethers.provider;
+
+    await provider.send("evm_setNextBlockTimestamp", [
+      Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 31,
+    ]);
+    await provider.send("evm_mine");
+
+    await expect(
+      crowdfunding.submitProofOfFundUse(0, proofURI)
+    ).to.be.revertedWith("Proof submission period has ended");
+  });
 });
