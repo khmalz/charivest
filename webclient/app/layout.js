@@ -1,16 +1,9 @@
-import { Roboto, Roboto_Mono } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Flowbite, ThemeModeScript } from "flowbite-react";
 
-const robotoSans = Roboto({
-   weight: ["100", "400", "500", "900"],
-   variable: "--font-roboto-sans",
-   subsets: ["latin"],
-});
-
-const robotoMono = Roboto_Mono({
-   weight: ["400", "700"],
-   variable: "--font-roboto-mono",
+const open_SansSans = Open_Sans({
+   weight: ["400", "500"],
    subsets: ["latin"],
 });
 
@@ -25,7 +18,7 @@ export default function RootLayout({ children }) {
          <head>
             <ThemeModeScript />
          </head>
-         <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased`}>
+         <body className={`${open_SansSans.className} antialiased`}>
             <Flowbite>{children}</Flowbite>
          </body>
       </html>
