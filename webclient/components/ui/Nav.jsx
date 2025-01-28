@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Button, DarkThemeToggle, Dropdown, Navbar, Popover } from "flowbite-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";

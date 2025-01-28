@@ -8,30 +8,23 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 function contentSidebar() {
-   const sideLink = [
-      {
-         title: "Profile",
-         url: "/dashboard/profile",
-         icon: HiUser,
-      },
-      {
-         title: "Campaign",
-         url: "/dashboard/campaign",
-         icon: HiViewBoards,
-      },
-   ];
-
    const pathname = usePathname();
 
    return (
       <>
          <Sidebar.Items>
             <Sidebar.ItemGroup>
-               {sideLink.map((item, index) => (
-                  <Sidebar.Item as={Link} key={index} href={item.url} active={pathname == item.url} className="rounded-lg" icon={item.icon}>
-                     {item.title}
+               <Sidebar.Item as={Link} href="/dashboard/profile" active={pathname == "/dashboard/profile"} className="rounded-lg" icon={HiUser}>
+                  Profile
+               </Sidebar.Item>
+               <Sidebar.Collapse icon={HiViewBoards} label="Campaign">
+                  <Sidebar.Item as={Link} href="/dashboard/campaign" active={pathname == "/dashboard/campaign"}>
+                     List Campaign
                   </Sidebar.Item>
-               ))}
+                  <Sidebar.Item as={Link} href="/dashboard/campaign/create" active={pathname == "/dashboard/campaign/create"}>
+                     Create Campaign
+                  </Sidebar.Item>
+               </Sidebar.Collapse>
                <Sidebar.Item href="#" icon={HiArrowSmLeft}>
                   Logout
                </Sidebar.Item>
@@ -43,13 +36,13 @@ function contentSidebar() {
 
 const sidebarTheme = {
    root: {
-      inner: "h-full overflow-y-auto overflow-x-hidden rounded bg-slate-200 shadow-lg dark:shadow-slate-900 px-3 py-4 dark:bg-gray-800",
+      inner: "h-full overflow-y-auto overflow-x-hidden rounded shadow-lg dark:shadow-slate-900 px-3 py-4 bg-slate-200 dark:!bg-dashboardprimary",
    },
 };
 
 export function SidebarDashboard() {
    return (
-      <Sidebar theme={sidebarTheme} aria-label="Sidebar with logo branding" className="md:w-1/5 h-auto min-h-screen hidden md:block bg-slate-200 dark:bg-dashboardprimary">
+      <Sidebar theme={sidebarTheme} aria-label="Sidebar with logo branding" className="md:w-1/5 h-auto min-h-screen hidden md:block">
          <Sidebar.Logo href="#">Charivest</Sidebar.Logo>
          {contentSidebar()}
       </Sidebar>

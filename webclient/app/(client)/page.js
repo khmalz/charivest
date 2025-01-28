@@ -1,5 +1,6 @@
 import { Button, Progress } from "flowbite-react";
 import { BadgeDollarSign } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
    const campaigns = [
@@ -57,7 +58,7 @@ export default function Home() {
                <h3 className="text-center text-2xl font-bold dark:text-white sm:text-4xl md:text-5xl">Campaign List</h3>
 
                <div className="mt-14 grid grid-cols-1 gap-4 mx-auto md:grid-cols-2 xl:grid-cols-3">
-                  {campaigns.map(item => (
+                  {campaigns.slice(0, 3).map(item => (
                      <div key={item.id} className="group flex max-w-md flex-col justify-between overflow-hidden rounded-lg dark:bg-slate-700 dark:shadow shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-102">
                         <div>
                            <div className="flex h-52 w-auto items-center justify-center bg-gray-400">
@@ -66,23 +67,23 @@ export default function Home() {
                               </svg>
                            </div>
                            <div className="p-5">
-                              <h5 className="text-2xl font-bold capitalize tracking-tight dark:text-slate-200">{item.title}</h5>
+                              <h5 className="text-2xl font-bold capitalize text-slate-900 tracking-tight dark:text-slate-200">{item.title}</h5>
                               <div className="my-3">
                                  <span className="mr-2 inline-flex cursor-pointer items-center rounded-full bg-primary text-white dark:bg-gray-100 px-2.5 py-0.5 text-xs font-medium dark:text-gray-800 hover:bg-gray-200/90">{item.category}</span>
                               </div>
-                              <p className="text-sm font-normal dark:text-slate-200 md:text-base mb-5">{item.description}</p>
+                              <p className="text-sm font-normal dark:text-slate-200 text-slate-900 md:text-base mb-5">{item.description}</p>
                            </div>
                         </div>
                         <div>
                            <div className="px-5">
                               <div>
                                  <div className="flex items-center justify-between">
-                                    <p className="dark:text-slate-200 text-xs md:text-sm">${item.raised} raised</p>
-                                    <p className="dark:text-slate-200 text-xs md:text-sm">{(item.raised * 100) / item.target}%</p>
+                                    <p className="dark:text-slate-200 text-slate-900 text-xs md:text-sm">${item.raised} raised</p>
+                                    <p className="dark:text-slate-200 text-slate-900 text-xs md:text-sm">{(item.raised * 100) / item.target}%</p>
                                  </div>
                                  <Progress progress={45} />
                               </div>
-                              <h6 className="dark:text-slate-200 font-semibold text-sm md:text-base mt-1">Goal ${item.target}</h6>
+                              <h6 className="dark:text-slate-200 text-slate-900 font-semibold text-sm md:text-base mt-1">Goal ${item.target}</h6>
                            </div>
                            <div className="flex space-x-3 px-5 pb-4 pt-2 items-center justify-between">
                               <p className="text-sm text-slate-500 dark:text-blue-200">2 Jan 2025</p>
@@ -97,6 +98,9 @@ export default function Home() {
                      </div>
                   ))}
                </div>
+               <Button size="lg" color="info" as={Link} href="/campaign" className="mx-auto mt-5 text-center hover:bg-cyan-800">
+                  More
+               </Button>
             </div>
          </section>
       </div>

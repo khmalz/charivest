@@ -1,101 +1,91 @@
 "use client";
 
-import { DropzoneInput } from "@/components/ui/DropzoneInput";
-import { Datepicker, Label, Textarea, TextInput } from "flowbite-react";
-import { X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useState } from "react";
-
-const datepickerTheme = {
-   popup: {
-      footer: {
-         button: {
-            today: "bg-primary text-white hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-primary",
-         },
-      },
-   },
-};
+import { Button, Progress } from "flowbite-react";
+import { BadgeDollarSign } from "lucide-react";
 
 export default function Campaign() {
-   const [files, setFiles] = useState([]);
-
-   const onDrop = useCallback(
-      acceptedFiles => {
-         if (acceptedFiles.length > 3 || files.length + acceptedFiles.length > 3) {
-            alert("Anda hanya bisa meng-upload maksimal 3 file.");
-            return;
-         }
-
-         const mappedFiles = acceptedFiles.map(file => ({
-            file,
-            preview: URL.createObjectURL(file),
-         }));
-         setFiles(prev => [...prev, ...mappedFiles]);
+   const campaigns = [
+      {
+         id: 1,
+         title: "Campaign 1",
+         category: "category",
+         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+         target: 1000,
+         raised: 500,
       },
-      [files.length]
-   );
-
-   const handleDelete = index => {
-      setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-   };
-
-   const thumbs = files.map((fileWrapper, index) => (
-      <div key={index} className="relative py-2">
-         <button type="button" onClick={() => handleDelete(index)} className="absolute top-0 right-0 p-1 m-4 text-white rounded-full bg-gray-100/80 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-bg-gray-100/80">
-            <X className="text-black w-8" />
-         </button>
-         <Image src={fileWrapper.preview} width={128} height={128} alt={`image-preview-${index}`} className="w-56 h-56 object-cover rounded-md" />
-      </div>
-   ));
+      {
+         id: 2,
+         title: "Campaign 2",
+         category: "category",
+         description: "Lorem ipsum dolor sit amet.",
+         target: 2500,
+         raised: 600,
+      },
+      {
+         id: 3,
+         title: "Campaign 3",
+         category: "category",
+         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+         target: 800,
+         raised: 200,
+      },
+      {
+         id: 4,
+         title: "Campaign 4",
+         category: "category",
+         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+         target: 1500,
+         raised: 600,
+      },
+   ];
 
    return (
-      <div>
-         <section id="create">
-            <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl mt-24">Create Campaign</h2>
+      <section id="campaign" className="mt-5">
+         <div className="flex flex-col">
+            <h3 className="text-2xl font-bold dark:text-white text-slate-900 sm:text-4xl">Campaign List</h3>
 
-            <div className="flex justify-center">
-               <div className="w-full max-w-3xl p-3">
-                  <form action="">
-                     <div className="flex flex-col w-full mt-3 gap-y-2">
-                        <div className="grid grid-cols-2 space-x-2">
-                           <div>
-                              <div className="mb-2 block">
-                                 <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
-                              </div>
-                              <TextInput id="title" type="text" />
-                           </div>
-                           <div>
-                              <div className="mb-2 block">
-                                 <Label htmlFor="deadline" className="dark:text-white text-slate-800" value="Deadline" />
-                              </div>
-                              <Datepicker language="id-ID" theme={datepickerTheme} labelTodayButton="Hari Ini" labelClearButton="Clear" minDate={new Date()} />
-                           </div>
+            <div className="mt-5 grid grid-cols-1 gap-4 mx-auto md:grid-cols-2 xl:grid-cols-3">
+               {campaigns.map(item => (
+                  <div key={item.id} className="group flex max-w-md flex-col justify-between overflow-hidden rounded-lg dark:bg-slate-700 dark:shadow shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-102">
+                     <div>
+                        <div className="flex h-52 w-auto items-center justify-center bg-gray-400">
+                           <svg className="h-10 w-10 text-gray-200 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                              <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+                           </svg>
                         </div>
-                        <div className="max-w-full">
-                           <div className="mb-2 block">
-                              <Label htmlFor="description" value="Description" className="dark:text-white text-slate-800" />
+                        <div className="p-5">
+                           <h5 className="text-2xl font-bold capitalize text-slate-900 tracking-tight dark:text-slate-200">{item.title}</h5>
+                           <div className="my-3">
+                              <span className="mr-2 inline-flex cursor-pointer items-center rounded-full bg-primary text-white dark:bg-gray-100 px-2.5 py-0.5 text-xs font-medium dark:text-gray-800 hover:bg-gray-200/90">{item.category}</span>
                            </div>
-                           <Textarea id="description" placeholder="Leave a description..." required rows={4} />
-                        </div>
-                        <div>
-                           <div className="mb-2 block">
-                              <Label htmlFor="image" value="Image" className="dark:text-white text-slate-800" />
-                           </div>
-
-                           <DropzoneInput onDrop={onDrop} />
-
-                           {files.length > 0 && <div className="grid grid-cols-3 space-x-2 mt-2">{thumbs}</div>}
-                        </div>
-                        <div>
-                           <button type="submit" className="px-3 py-1.5 mt-1 text-sm font-medium text-center text-white bg-blue-700 rounded-lg round hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                              Submit
-                           </button>
+                           <p className="text-sm font-normal dark:text-slate-200 text-slate-900 md:text-base mb-5">{item.description}</p>
                         </div>
                      </div>
-                  </form>
-               </div>
+                     <div>
+                        <div className="px-5">
+                           <div>
+                              <div className="flex items-center justify-between">
+                                 <p className="dark:text-slate-200 text-slate-900 text-xs md:text-sm">${item.raised} raised</p>
+                                 <p className="dark:text-slate-200 text-slate-900 text-xs md:text-sm">{(item.raised * 100) / item.target}%</p>
+                              </div>
+                              <Progress progress={45} />
+                           </div>
+                           <h6 className="dark:text-slate-200 text-slate-900 font-semibold text-sm md:text-base mt-1">Goal ${item.target}</h6>
+                        </div>
+                        <div className="flex space-x-3 px-5 pb-4 pt-2 items-center justify-between">
+                           <p className="text-sm text-slate-500 dark:text-blue-200">2 Jan 2025</p>
+                           <Button size="sm">
+                              <div className="flex items-center justify-center">
+                                 <BadgeDollarSign className="mr-2 h-5 w-5" />
+                                 Fund
+                              </div>
+                           </Button>
+                        </div>
+                     </div>
+                  </div>
+               ))}
             </div>
-         </section>
-      </div>
+         </div>
+      </section>
    );
 }

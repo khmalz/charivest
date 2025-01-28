@@ -19,7 +19,7 @@ export function DropzoneInput({ id, onDrop, ...props }) {
             }`}>
             <Label
                htmlFor="dropzone-file"
-               className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+               className="flex h-64 w-full cursor-pointer text-center flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                <div className="flex flex-col items-center justify-center pb-6 pt-5">
                   <svg className="mb-4 h-8 w-8 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                      <path
@@ -33,7 +33,7 @@ export function DropzoneInput({ id, onDrop, ...props }) {
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                      <span className="font-semibold">Click to upload</span> or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, or JPG (MAX. 3 files)</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">SVG, PNG, or JPG (MAX. 3 files)</p>
                </div>
             </Label>
             <input id={id} {...getInputProps()} {...props} className="hidden" />

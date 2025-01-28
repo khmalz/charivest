@@ -1,5 +1,7 @@
-import React from "react";
-
 export default function DashboardCampaign() {
-   return <div>Dashboard Campaign</div>;
+   return (
+      <div>
+         <h1 className="text-2xl font-bold">List Campaign</h1>
+      </div>
+   );
 }
