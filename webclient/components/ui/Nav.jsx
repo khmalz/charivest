@@ -6,37 +6,50 @@ import Link from "next/link";
 import { CircleUser } from "lucide-react";
 import { useState } from "react";
 import { useSDK } from "@metamask/sdk-react";
-import { formatAddress } from "@/helpers/utils";
-import { ethers } from "ethers";
 
 export default function Nav() {
-   const [accountData, setAccountData] = useState({
-      address: "",
-      balance: 0,
-   });
    const { sdk, connected, connecting } = useSDK();
+   const [walletAddress, setWalletAddress] = useState("");
+   const [username, setUsername] = useState("");
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState(null);
 
    const connect = async () => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
       try {
+         setLoading(true);
          const accounts = await sdk?.connect();
          const address = accounts?.[0];
 
-         const balance = await window.ethereum.request({
-            method: "eth_getBalance",
-            params: [address, "latest"],
-         });
-
-         setAccountData({
-            address,
-            balance: ethers.formatEther(balance),
-         });
-
+         setWalletAddress(address);
          console.log("Connected to MetaMask");
+
+         const response = await fetch("/api/wallet/save", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ address }),
+         });
+
+         const data = await response.json();
+         if (response.ok) {
+            setUsername(data.user.username || "Dummy User");
+            console.log("User data:", data.user);
+         } else {
+            setError(data.message || "Unknown error occurred");
+         }
       } catch (err) {
-         console.error("Error connecting to MetaMask:", err);
+         console.error("Failed to connect wallet:", error);
+         setError("Failed to connect wallet");
+      } finally {
+         setLoading(false);
       }
    };
-
    const disconnect = () => {
       if (sdk) {
          sdk.terminate();
@@ -79,18 +92,19 @@ export default function Nav() {
                <DarkThemeToggle className="focus:ring-1" />
             </Popover>
 
-            {connected ? (
+            {connected && username ? (
                <Dropdown arrowIcon={false} inline label={<CircleUser className="text-gray-500 dark:text-gray-400" />}>
                   <Dropdown.Header>
-                     <span className="block text-sm">{formatAddress(accountData.address)}</span>
+                     <span className="block text-sm">{loading ? "Connecting..." : username ? username : walletAddress ? walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4) : "No wallet connected"}</span>
                   </Dropdown.Header>
-                  <Dropdown.Item>{accountData.balance}</Dropdown.Item>
-                  <Dropdown.Item>Dashboard</Dropdown.Item>
+                  <Dropdown.Item as={Link} href="/dashboard/profile">
+                     Dashboard
+                  </Dropdown.Item>
                   <Dropdown.Item onClick={disconnect}>Sign out</Dropdown.Item>
                </Dropdown>
             ) : (
-               <Button size="xs" onClick={connect} disabled={connecting} className="!text-white dark:bg-amber-700 hidden md:block dark:hover:!bg-amber-800 focus:ring-1 dark:focus:bg-amber-700">
-                  <span className="lg:text-sm">Connect with E-wallet {connected}</span>
+               <Button size="xs" isProcessing={loading} onClick={connect} disabled={connecting} className="!text-white dark:bg-amber-700 hidden md:block dark:hover:!bg-amber-800 focus:ring-1 dark:focus:bg-amber-700">
+                  <span className="lg:text-sm">Connect with E-wallet</span>
                </Button>
             )}
             <Navbar.Toggle className="dark:!text-gray-400 hover:bg-opacity-5 focus:ring-1" />
@@ -101,9 +115,11 @@ export default function Nav() {
                   {item.text}
                </Navbar.Link>
             ))}
-            <Button size="sm" className="!text-white dark:bg-amber-700 dark:hover:!bg-amber-800 mt-2 focus:ring-1 dark:focus:bg-amber-700">
-               Connect with E-wallet
-            </Button>
+            {!(connected && username) && (
+               <Button size="sm" isProcessing={loading} onClick={connect} disabled={connecting} className="!text-white dark:bg-amber-700 dark:hover:!bg-amber-800 mt-2 focus:ring-1 dark:focus:bg-amber-700">
+                  Connect with E-wallet
+               </Button>
+            )}
          </Navbar.Collapse>
       </Navbar>
    );

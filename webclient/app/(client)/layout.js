@@ -5,7 +5,6 @@ import { MetaMaskProvider } from "@metamask/sdk-react";
 
 export default function RootLayout({ children }) {
    const host = typeof window !== "undefined" ? window.location.host : "defaultHost";
-
    const sdkOptions = {
       logging: { developerMode: false },
       checkInstallationImmediately: false,

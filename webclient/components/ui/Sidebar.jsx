@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Sidebar } from "flowbite-react";
-import { X } from "lucide-react";
+import { Link2, X } from "lucide-react";
 import { HiArrowSmLeft, HiUser, HiViewBoards } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
@@ -43,7 +43,9 @@ const sidebarTheme = {
 export function SidebarDashboard() {
    return (
       <Sidebar theme={sidebarTheme} aria-label="Sidebar with logo branding" className="md:w-1/5 h-auto min-h-screen hidden md:block">
-         <Sidebar.Logo href="#">Charivest</Sidebar.Logo>
+         <Sidebar.Logo href="/" as={Link}>
+            Charivest
+         </Sidebar.Logo>
          {contentSidebar()}
       </Sidebar>
    );
@@ -55,7 +57,9 @@ export function DrawerSidebarDashboard() {
    return (
       <Sidebar aria-label="Sidebar with logo branding" className="block p-0 m-0">
          <div className="flex justify-between items-start">
-            <Sidebar.Logo href="#">Charivest</Sidebar.Logo>
+            <Sidebar.Logo href="/" as={Link}>
+               Charivest
+            </Sidebar.Logo>
             <Button color="light" size="sm" onClick={() => toggleDrawer()} className="w-8 h-8 border-none flex items-center justify-center dark:hover:bg-slate-700 dark:bg-slate-800">
                <X className="w-5" />
             </Button>
