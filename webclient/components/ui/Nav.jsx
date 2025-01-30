@@ -47,6 +47,7 @@ export default function Nav() {
       { text: "Home", link: "/" },
       { text: "Contact", link: "/#contact" },
       { text: "Campaign", link: "/campaign" },
+      { text: "Leaderboard", link: "/leaderboard" },
    ];
 
    const contentPopover = (
