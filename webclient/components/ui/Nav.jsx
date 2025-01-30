@@ -4,7 +4,7 @@ import { Button, DarkThemeToggle, Dropdown, Navbar, Popover } from "flowbite-rea
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CircleUser } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSDK } from "@metamask/sdk-react";
 
 export default function Nav() {
@@ -13,6 +13,15 @@ export default function Nav() {
    const [username, setUsername] = useState("");
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
+
+   useEffect(() => {
+      const savedWalletAddress = localStorage.getItem("walletAddress");
+      const savedUsername = localStorage.getItem("username");
+
+      if (savedWalletAddress && savedUsername) {
+         setWalletAddress(savedWalletAddress), setUsername(savedUsername);
+      }
+   }, []);
 
    const connect = async () => {
       if (!window.ethereum) {
@@ -38,7 +47,11 @@ export default function Nav() {
 
          const data = await response.json();
          if (response.ok) {
-            setUsername(data.user.username || "Dummy User");
+            const username = data.user.username || "Dummy User";
+            setUsername(username);
+
+            localStorage.setItem("walletAddress", address), localStorage.setItem("username", username);
+
             console.log("User data:", data.user);
          } else {
             setError(data.message || "Unknown error occurred");
@@ -50,9 +63,13 @@ export default function Nav() {
          setLoading(false);
       }
    };
+   
    const disconnect = () => {
       if (sdk) {
          sdk.terminate();
+
+         localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
+         setWalletAddress(""), setUsername(""), setError(null);
       }
    };
 

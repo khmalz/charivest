@@ -2,7 +2,7 @@
 
 import { Button, Sidebar } from "flowbite-react";
 import { Link2, X } from "lucide-react";
-import { HiArrowSmLeft, HiUser, HiViewBoards } from "react-icons/hi";
+import { HiUser, HiViewBoards } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -25,9 +25,6 @@ function contentSidebar() {
                      Create Campaign
                   </Sidebar.Item>
                </Sidebar.Collapse>
-               <Sidebar.Item href="#" icon={HiArrowSmLeft}>
-                  Logout
-               </Sidebar.Item>
             </Sidebar.ItemGroup>
          </Sidebar.Items>
       </>
