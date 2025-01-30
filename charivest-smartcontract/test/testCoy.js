@@ -11,16 +11,21 @@ describe("Crowdfunding Contract", function () {
   });
 
   it("create a campaign", async function () {
-    const title = "Kampanye Koca";
+    const title = "Kampanye Kocak";
     const description = "Kampanya untuk orang kocak";
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [
+      "https://example.com/photo1.jpg",
+      "https://example.com/photo2.jpg",
+    ];
 
     const tx = await crowdfunding.createCampaign(
       title,
       description,
       totalTarget,
-      deadline
+      deadline,
+      photos
     );
     await tx.wait();
 
@@ -28,6 +33,7 @@ describe("Crowdfunding Contract", function () {
     expect(campaigns.length).to.equal(1);
     expect(campaigns[0].title).to.equal(title);
     expect(campaigns[0].description).to.equal(description);
+    expect(campaigns[0].photos).to.deep.equal(photos);
   });
 
   it("donate to a campaign", async function () {
@@ -35,12 +41,14 @@ describe("Crowdfunding Contract", function () {
     const description = "Untuk misi sosial";
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [];
 
     await crowdfunding.createCampaign(
       title,
       description,
       totalTarget,
-      deadline
+      deadline,
+      photos
     );
 
     const donationAmount = ethers.parseEther("0.5");
@@ -53,8 +61,15 @@ describe("Crowdfunding Contract", function () {
   it("mark a campaign as completed when reach the target", async function () {
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [];
 
-    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+    await crowdfunding.createCampaign(
+      "Test",
+      "Test",
+      totalTarget,
+      deadline,
+      photos
+    );
 
     await crowdfunding.connect(addr1).donate(0, {
       value: ethers.parseEther("1.0"),
@@ -67,8 +82,15 @@ describe("Crowdfunding Contract", function () {
   it("allow proof submission by creator after completion", async function () {
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [];
 
-    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+    await crowdfunding.createCampaign(
+      "Test",
+      "Test",
+      totalTarget,
+      deadline,
+      photos
+    );
 
     await crowdfunding.connect(addr1).donate(0, {
       value: ethers.parseEther("1.0"),
@@ -77,23 +99,27 @@ describe("Crowdfunding Contract", function () {
     const proofURI = "https://example.com/proof";
     await crowdfunding.submitProofOfFundUse(0, proofURI);
 
-    const [, , , , , , , proofOfFundUse] = await crowdfunding.getDetailCampaign(
-      0
-    );
-    expect(proofOfFundUse).to.equal(proofURI);
+    const campaignDetails = await crowdfunding.getDetailCampaign(0);
+    expect(campaignDetails.proofOfFundUse).to.equal(proofURI);
   });
 
   it("return reward points", async function () {
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [];
 
-    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+    await crowdfunding.createCampaign(
+      "Test",
+      "Test",
+      totalTarget,
+      deadline,
+      photos
+    );
 
     const donationAmount = ethers.parseEther("0.5");
     await crowdfunding.connect(addr1).donate(0, { value: donationAmount });
 
     const rewardPoints = await crowdfunding.getRewardPoints(addr1.address);
-
     const expectedRewardPoints = BigInt(donationAmount) / BigInt(10);
 
     expect(rewardPoints).to.equal(expectedRewardPoints);
@@ -108,11 +134,14 @@ describe("Crowdfunding Contract", function () {
   });
 
   it("revert if donation is zero", async function () {
+    const photos = [];
+
     await crowdfunding.createCampaign(
       "Test",
       "Test",
       ethers.parseEther("1.0"),
-      Math.floor(Date.now() / 1000) + 60 * 60 * 24
+      Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+      photos
     );
 
     await expect(
@@ -123,15 +152,21 @@ describe("Crowdfunding Contract", function () {
   it("revert if proof submitted after deadline", async function () {
     const totalTarget = ethers.parseEther("1.0");
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const photos = [];
 
-    await crowdfunding.createCampaign("Test", "Test", totalTarget, deadline);
+    await crowdfunding.createCampaign(
+      "Test",
+      "Test",
+      totalTarget,
+      deadline,
+      photos
+    );
 
     await crowdfunding.connect(addr1).donate(0, {
       value: ethers.parseEther("1.0"),
     });
 
     const proofURI = "https://example.com/proof";
-
     const provider = ethers.provider;
 
     await provider.send("evm_setNextBlockTimestamp", [

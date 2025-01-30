@@ -6,6 +6,8 @@ import "./RewardPointsLib.sol";
 contract Crowdfunding {
     using RewardPointsLib for uint256;
 
+    address public admin;
+
     struct Campaign {
         address creator;
         string title;
@@ -17,11 +19,16 @@ contract Crowdfunding {
         string proofOfFundUse;
         bool proofSubmitted;
         address[] donors;
+        string[] photos;
     }
 
     mapping(uint256 => Campaign) private campaigns;
     mapping(address => uint256) private rewardPoints;
+    mapping(address => uint256) public totalDonations;
+    mapping(uint256 => mapping(address => bool)) private hasDonated;
+
     uint256 public campaignCount;
+    uint256 public constant PROOF_DEADLINE = 30 days;
 
     event CampaignCreated(uint256 campaignId, address indexed creator);
     event DonationReceived(
@@ -31,15 +38,25 @@ contract Crowdfunding {
     );
     event CampaignCompleted(uint256 campaignId);
     event ProofSubmitted(uint256 campaignId, string proofOfFundUse);
+    event PhotoAdded(uint256 campaignId, string photoURL);
+    event RewardPointsGranted(address indexed donor, uint256 points);
 
-    uint256 public constant PROOF_DEADLINE = 30 days;
+    constructor() {
+        admin = msg.sender;
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can create campaigns");
+        _;
+    }
 
     function createCampaign(
         string memory title,
         string memory description,
         uint256 totalTarget,
-        uint256 deadline
-    ) public {
+        uint256 deadline,
+        string[] memory photos
+    ) public onlyAdmin {
         require(bytes(title).length > 0, "Title is required");
         require(bytes(description).length > 0, "Description is required");
         require(totalTarget > 0, "Target must be greater than zero");
@@ -52,6 +69,7 @@ contract Crowdfunding {
         newCampaign.totalTarget = totalTarget;
         newCampaign.isCompleted = false;
         newCampaign.deadline = deadline;
+        newCampaign.photos = photos;
 
         emit CampaignCreated(campaignCount, msg.sender);
         campaignCount++;
@@ -66,7 +84,12 @@ contract Crowdfunding {
         require(block.timestamp <= campaign.deadline, "Campaign has ended");
 
         campaign.totalFunds += msg.value;
-        campaign.donors.push(msg.sender);
+        totalDonations[msg.sender] += msg.value;
+
+        if (!hasDonated[campaignId][msg.sender]) {
+            campaign.donors.push(msg.sender);
+            hasDonated[campaignId][msg.sender] = true;
+        }
 
         if (campaign.totalFunds >= campaign.totalTarget) {
             campaign.isCompleted = true;
@@ -77,6 +100,7 @@ contract Crowdfunding {
         uint256 points = msg.value.calculateReward();
         rewardPoints[msg.sender] += points;
 
+        emit RewardPointsGranted(msg.sender, points);
         emit DonationReceived(campaignId, msg.sender, msg.value);
     }
 
@@ -101,6 +125,22 @@ contract Crowdfunding {
         campaign.proofSubmitted = true;
 
         emit ProofSubmitted(campaignId, proofURI);
+    }
+
+    function addPhotoToCampaign(
+        uint256 campaignId,
+        string memory photoURL
+    ) public {
+        require(campaignId < campaignCount, "Invalid campaign ID");
+        Campaign storage campaign = campaigns[campaignId];
+        require(
+            msg.sender == campaign.creator,
+            "Only the creator can add photos"
+        );
+
+        campaign.photos.push(photoURL);
+
+        emit PhotoAdded(campaignId, photoURL);
     }
 
     function getRewardPoints(address user) public view returns (uint256) {
@@ -130,7 +170,8 @@ contract Crowdfunding {
             uint256 deadline,
             string memory proofOfFundUse,
             bool proofSubmitted,
-            address[] memory donors
+            address[] memory donors,
+            string[] memory photos
         )
     {
         require(campaignId < campaignCount, "Invalid campaign ID");
@@ -145,7 +186,8 @@ contract Crowdfunding {
             campaign.deadline,
             campaign.proofOfFundUse,
             campaign.proofSubmitted,
-            campaign.donors
+            campaign.donors,
+            campaign.photos
         );
     }
 }
