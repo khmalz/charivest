@@ -87,7 +87,7 @@ export default function Home() {
                            </div>
                            <div className="flex space-x-3 px-5 pb-4 pt-2 items-center justify-between">
                               <p className="text-sm text-slate-500 dark:text-blue-200">2 Jan 2025</p>
-                              <Button size="sm">
+                              <Button size="sm" as={Link} href={`/campaign/fund/${item.id}`} className="dark:hover:!bg-cyan-700 hover:!bg-cyan-800">
                                  <div className="flex items-center justify-center">
                                     <BadgeDollarSign className="mr-2 h-5 w-5" />
                                     Fund
