@@ -1,10 +1,15 @@
 "use client";
 
 import { Button, Label, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DashboardProfile() {
    const [name, setName] = useState("John Doe");
+
+   useEffect(() => {
+      const storedName = localStorage.getItem("username");
+      if (storedName) setName(storedName);
+   }, []);
 
    return (
       <div>
