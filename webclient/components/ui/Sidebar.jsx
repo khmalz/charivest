@@ -1,8 +1,8 @@
 "use client";
 
 import { Button, Sidebar } from "flowbite-react";
-import { Link2, X } from "lucide-react";
-import { HiUser, HiViewBoards } from "react-icons/hi";
+import { X } from "lucide-react";
+import { HiClock, HiUser, HiViewBoards } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -16,6 +16,9 @@ function contentSidebar() {
             <Sidebar.ItemGroup>
                <Sidebar.Item as={Link} href="/dashboard/profile" active={pathname == "/dashboard/profile"} className="rounded-lg" icon={HiUser}>
                   Profile
+               </Sidebar.Item>
+               <Sidebar.Item as={Link} href="/dashboard/campaign-history" active={pathname == "/dashboard/campaign-history"} className="rounded-lg" icon={HiClock}>
+                  History Campaign
                </Sidebar.Item>
                <Sidebar.Collapse icon={HiViewBoards} label="Campaign">
                   <Sidebar.Item as={Link} href="/dashboard/campaign" active={pathname == "/dashboard/campaign" || (pathname.startsWith("/dashboard/campaign/") && !pathname.includes("/create"))}>
