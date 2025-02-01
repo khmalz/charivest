@@ -63,7 +63,7 @@ export default function Nav() {
          setLoading(false);
       }
    };
-   
+
    const disconnect = () => {
       if (sdk) {
          sdk.terminate();
@@ -94,7 +94,7 @@ export default function Nav() {
       <Navbar fluid theme={"dark"} className="fixed start-0 top-0 z-20 w-full bg-white bg-opacity-5 shadow dark:shadow-sm backdrop-blur-sm py-3 md:py-5 md:px-8 lg:!px-20">
          <div className="md:flex md:items-center lg:items-start md:space-x-5 lg:space-x-8">
             <Navbar.Brand>
-               <span className="self-center whitespace-nowrap text-xl lg:text-2xl font-semibold dark:text-white">Flowbite React</span>
+               <span className="self-center whitespace-nowrap text-xl lg:text-2xl font-semibold dark:text-white">Charivest</span>
             </Navbar.Brand>
             <Navbar.Collapse className="hidden lg:flex">
                {navLink.map((item, index) => (
@@ -114,9 +114,7 @@ export default function Nav() {
                   <Dropdown.Header>
                      <span className="block text-sm">{loading ? "Connecting..." : username ? username : walletAddress ? walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4) : "No wallet connected"}</span>
                   </Dropdown.Header>
-                  <Dropdown.Item as={Link} href="/dashboard/profile">
-                     Dashboard
-                  </Dropdown.Item>
+                  <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
                   <Dropdown.Item onClick={disconnect}>Sign out</Dropdown.Item>
                </Dropdown>
             ) : (
