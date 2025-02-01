@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { DrawerSidebarDashboard } from "./Sidebar";
-import Link from "next/link";
 import { useSDK } from "@metamask/sdk-react";
 import { useRouter } from "next/navigation";
 
@@ -20,8 +19,11 @@ export default function DrawerDashboard() {
       const savedWalletAddress = localStorage.getItem("walletAddress");
       const savedUsername = localStorage.getItem("username");
 
-      if (savedWalletAddress && savedUsername) {
-         setWalletAddress(savedWalletAddress), setUsername(savedUsername);
+      if (savedWalletAddress) {
+         setWalletAddress(savedWalletAddress);
+      }
+      if (savedUsername) {
+         setUsername(savedUsername);
       }
    }, []);
 
