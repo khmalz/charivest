@@ -2,7 +2,7 @@
 
 import { Button, Sidebar } from "flowbite-react";
 import { X } from "lucide-react";
-import { HiClock, HiUser, HiViewBoards } from "react-icons/hi";
+import { HiClock, HiUser, HiViewBoards, HiViewGrid } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -14,6 +14,9 @@ function contentSidebar() {
       <>
          <Sidebar.Items>
             <Sidebar.ItemGroup>
+               <Sidebar.Item as={Link} href="/dashboard" active={pathname == "/dashboard"} className="rounded-lg" icon={HiViewGrid}>
+                  Overview
+               </Sidebar.Item>
                <Sidebar.Item as={Link} href="/dashboard/profile" active={pathname == "/dashboard/profile"} className="rounded-lg" icon={HiUser}>
                   Profile
                </Sidebar.Item>
