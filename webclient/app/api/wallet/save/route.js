@@ -39,7 +39,7 @@ export async function POST(request) {
     ]);
 
     return NextResponse.json(
-      { message: "User created", userId: newUser.id },
+      { message: "User created", userId: newUser.id, username: newUser.username },
       { status: 201 }
     );
   } catch (error) {

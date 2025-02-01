@@ -6,7 +6,8 @@
       "dev": "next dev --turbopack",
       "build": "next build",
       "start": "next start",
-      "lint": "next lint"
+      "lint": "next lint",
+      "fresh-db": "node ./migrations/drop.js && node ./migrations/init.js"
    },
    "dependencies": {
       "@metamask/sdk-react": "^0.32.0",
