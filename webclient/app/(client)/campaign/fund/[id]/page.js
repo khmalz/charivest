@@ -5,7 +5,7 @@ import { DollarSignIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 // import { ethers } from "ethers";
-// import contract from "@/utils/contractUtils";
+import contract from "@/utils/contractUtils";
 
 export default function FundCampaign() {
    const { id } = useParams();
