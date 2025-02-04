@@ -18,8 +18,11 @@ export default function Nav() {
       const savedWalletAddress = localStorage.getItem("walletAddress");
       const savedUsername = localStorage.getItem("username");
 
-      if (savedWalletAddress && savedUsername) {
-         setWalletAddress(savedWalletAddress), setUsername(savedUsername);
+      if (savedWalletAddress) {
+         setWalletAddress(savedWalletAddress);
+      }
+      if (savedUsername) {
+         setUsername(savedUsername);
       }
    }, []);
 
@@ -34,31 +37,37 @@ export default function Nav() {
          const accounts = await sdk?.connect();
          const address = accounts?.[0];
 
-         setWalletAddress(address);
-         console.log("Connected to MetaMask");
+         if (address) {
+            setWalletAddress(address);
+            localStorage.setItem("walletAddress", address);
+         }
 
-         const response = await fetch("/api/wallet/save", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ address }),
-         });
+         if (address) {
+            const response = await fetch("/api/wallet/save", {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+               body: JSON.stringify({ address }),
+            });
 
-         const data = await response.json();
-         if (response.ok) {
-            const username = data.user.username || "Dummy User";
-            setUsername(username);
+            const data = await response.json();
 
-            localStorage.setItem("walletAddress", address), localStorage.setItem("username", username);
+            if (response.ok) {
+               console.log(data);
+               const fetchedUsername = data?.username || "Dummy User";
+               setUsername(fetchedUsername);
 
-            console.log("User data:", data.user);
+               localStorage.setItem("username", fetchedUsername);
+            } else {
+               setError(data.message || "Unknown error occurred");
+            }
          } else {
-            setError(data.message || "Unknown error occurred");
+            setError("Failed to connect wallet");
          }
       } catch (err) {
-         console.error("Failed to connect wallet:", error);
          setError("Failed to connect wallet");
+         console.error("Failed to connect wallet:", error);
       } finally {
          setLoading(false);
       }
@@ -67,7 +76,6 @@ export default function Nav() {
    const disconnect = () => {
       if (sdk) {
          sdk.terminate();
-
          localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
          setWalletAddress(""), setUsername(""), setError(null);
       }
@@ -112,7 +120,7 @@ export default function Nav() {
             {connected && username ? (
                <Dropdown arrowIcon={false} inline label={<CircleUser className="text-gray-500 dark:text-gray-400" />}>
                   <Dropdown.Header>
-                     <span className="block text-sm">{loading ? "Connecting..." : username ? username : walletAddress ? walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4) : "No wallet connected"}</span>
+                     <span className="block text-sm">{loading ? "Connecting..." : username || walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4)}</span>
                   </Dropdown.Header>
                   <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
                   <Dropdown.Item onClick={disconnect}>Sign out</Dropdown.Item>

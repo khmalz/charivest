@@ -3,12 +3,25 @@
 import { Button, Checkbox, Label, Progress, Radio, TextInput } from "flowbite-react";
 import { DollarSignIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+// import { ethers } from "ethers";
+import contract from "@/utils/contractUtils";
 
 export default function FundCampaign() {
    const { id } = useParams();
    const [clickOther, setClickOther] = useState(false);
-   const [amountValue, setAmountValue] = useState("");
+   const [amountValue, setAmountValue] = useState("Other");
+
+   const progressTheme = {
+      label: "mb-1 flex justify-between font-medium dark:text-slate-200 text-slate-900",
+      bar: "space-x-2 rounded-full text-center font-medium leading-none text-cyan-200 dark:text-cyan-100",
+   };
+
+   useEffect(() => {
+      if (!window.ethereum) {
+         alert("Please install MetaMask!");
+      }
+   }, []);
 
    const handleRadioChange = e => {
       const value = e.target.value;
@@ -16,10 +29,26 @@ export default function FundCampaign() {
       setClickOther(value === "Other");
    };
 
-   const progressTheme = {
-      label: "mb-1 flex justify-between font-medium dark:text-slate-200 text-slate-900",
-      bar: "space-x-2 rounded-full text-center font-medium leading-none text-cyan-200 dark:text-cyan-100",
-   };
+   // const connectAndFund = async () => {
+   //   if (!window.ethereum) return alert("MetaMask not found!");
+
+   //   try {
+   //     const provider = new ethers.BrowserProvider(window.ethereum);
+   //     await provider.send("eth_requestAccounts", []);
+   //     const signer = await provider.getSigner();
+   //     const contractWithSigner = contract.connect(signer);
+
+   //     const amountInWei = ethers.parseEther(amountValue || "0");
+   //     const tx = await contractWithSigner.donate(id, { value: amountInWei });
+
+   //     alert("Donation transaction sent!");
+   //     await tx.wait();
+   //     alert("Donation successful!");
+   //   } catch (err) {
+   //     console.error("Error donating:", err);
+   //     alert("Donation failed!");
+   //   }
+   // };
 
    return (
       <section id="fund" className="mt-5">
@@ -36,8 +65,10 @@ export default function FundCampaign() {
                <ul className="items-center w-full mt-5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                   <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                      <div className="flex items-center gap-3">
-                        <Radio id="5$" name="amount" value="5" className="hidden peer" defaultChecked onChange={handleRadioChange} />
-                        <Label htmlFor="5$" className="w-full py-4 rounded-lg ps-2 text-sm font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
+                        <Radio id="5$" name="amount" value="5" className="hidden peer" onChange={handleRadioChange} />
+                        <Label
+                           htmlFor="5$"
+                           className="w-full py-4 rounded-lg ps-2 text-sm hover:cursor-pointer font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
                            $5
                         </Label>
                      </div>
@@ -45,7 +76,9 @@ export default function FundCampaign() {
                   <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                      <div className="flex items-center gap-3">
                         <Radio id="10$" name="amount" value="10" className="hidden peer" onChange={handleRadioChange} />
-                        <Label htmlFor="10$" className="w-full py-4 rounded-lg ps-2 text-sm font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
+                        <Label
+                           htmlFor="10$"
+                           className="w-full py-4 rounded-lg ps-2 text-sm hover:cursor-pointer font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
                            $10
                         </Label>
                      </div>
@@ -53,7 +86,9 @@ export default function FundCampaign() {
                   <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                      <div className="flex items-center gap-3">
                         <Radio id="20$" name="amount" value="20" className="hidden peer" onChange={handleRadioChange} />
-                        <Label htmlFor="20$" className="w-full py-4 rounded-lg ps-2 text-sm font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
+                        <Label
+                           htmlFor="20$"
+                           className="w-full py-4 rounded-lg ps-2 text-sm hover:cursor-pointer font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
                            $20
                         </Label>
                      </div>
@@ -63,7 +98,7 @@ export default function FundCampaign() {
                         <Radio id="other" name="amount" value="Other" className="hidden peer" onChange={handleRadioChange} />
                         <Label
                            htmlFor="other"
-                           className="w-full py-4 rounded-lg ps-2 text-sm font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
+                           className="w-full py-4 rounded-lg ps-2 text-sm hover:cursor-pointer font-medium text-gray-900 dark:text-gray-300 dark:peer-checked:bg-slate-200 dark:peer-checked:text-primary peer-checked:bg-cyan-600 peer-checked:text-white">
                            Other
                         </Label>
                      </div>
