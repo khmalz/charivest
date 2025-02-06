@@ -1,6 +1,8 @@
 "use client";
 
 import { DropzoneInput } from "@/components/ui/DropzoneInput";
+import { initializeContract } from "@/utils/contractUtils";
+import { ethers } from "ethers";
 import { Button, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { X } from "lucide-react";
 import Image from "next/image";
@@ -18,6 +20,7 @@ const datepickerTheme = {
 
 export default function DashboardCreateCampaign() {
    const [files, setFiles] = useState([]);
+   const [isLoading, setIsLoading] = useState(false);
 
    const onDrop = useCallback(
       acceptedFiles => {
@@ -48,6 +51,40 @@ export default function DashboardCreateCampaign() {
       </div>
    ));
 
+   const createCampaign = async e => {
+      e.preventDefault();
+
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
+      const formData = new FormData(e.target);
+
+      const title = formData.get("title");
+      const description = formData.get("description");
+      const totalTarget = ethers.parseEther("1.0");
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+      const photos = ["https://random.imagecdn.app/500/500"];
+
+      try {
+         setIsLoading(true);
+
+         const { contract } = await initializeContract();
+
+         if (contract) {
+            const txCampaign = await contract.createCampaign(title, description, totalTarget, deadline, photos);
+            await txCampaign.wait();
+
+            console.log("Campaign created");
+         }
+      } catch (error) {
+         console.error("Error getting contract balance:", error);
+      } finally {
+         setIsLoading(false);
+      }
+   };
+
    return (
       <div>
          <h1 className="text-2xl font-bold">Create Campaign</h1>
@@ -55,14 +92,14 @@ export default function DashboardCreateCampaign() {
          <div className="mt-5 w-full shadow-lg dark:bg-dashboardsecondary p-5 rounded-lg flex flex-col space-y-5">
             <div className="flex">
                <div className="w-full">
-                  <form action="">
+                  <form onSubmit={createCampaign}>
                      <div className="flex flex-col w-full mt-3 space-y-2">
                         <div className="grid sm:grid-cols-2 sm:gap-x-2 gap-y-2 sm:gap-y-0">
                            <div>
                               <div className="mb-2 block">
                                  <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
                               </div>
-                              <TextInput id="title" type="text" />
+                              <TextInput id="title" type="text" name="title" placeholder="Title" />
                            </div>
                            <div>
                               <div className="mb-2 block">
@@ -75,7 +112,7 @@ export default function DashboardCreateCampaign() {
                            <div className="mb-2 block">
                               <Label htmlFor="description" value="Description" className="dark:text-white text-slate-800" />
                            </div>
-                           <Textarea id="description" placeholder="Leave a description..." required rows={4} />
+                           <Textarea id="description" placeholder="Leave a description..." required rows={4} name="description" />
                         </div>
                         <div>
                            <div className="mb-2 block">
@@ -87,7 +124,7 @@ export default function DashboardCreateCampaign() {
                            {files.length > 0 && <div className="grid grid-cols-3 space-x-2 mt-2">{thumbs}</div>}
                         </div>
                         <div className="flex justify-end mt-5">
-                           <Button color="light" className="border-none dark:hover:bg-slate-700 dark:bg-slate-800 max-w-28 md:max-w-32 w-full">
+                           <Button color="light" isProcessing={isLoading} type="submit" className="border-none dark:hover:bg-slate-700 dark:bg-slate-800 max-w-28 md:max-w-32 w-full">
                               Submit
                            </Button>
                         </div>
