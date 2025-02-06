@@ -1,44 +1,72 @@
 "use client";
 
+import { initializeContract } from "@/utils/contractUtils";
 import { Button, Progress } from "flowbite-react";
 import { BadgeDollarSign } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Campaign() {
-   const campaigns = [
-      {
-         id: 1,
-         title: "Campaign 1",
-         category: "category",
-         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
-         target: 1000,
-         raised: 500,
-      },
-      {
-         id: 2,
-         title: "Campaign 2",
-         category: "category",
-         description: "Lorem ipsum dolor sit amet.",
-         target: 2500,
-         raised: 600,
-      },
-      {
-         id: 3,
-         title: "Campaign 3",
-         category: "category",
-         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
-         target: 800,
-         raised: 200,
-      },
-      {
-         id: 4,
-         title: "Campaign 4",
-         category: "category",
-         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
-         target: 1500,
-         raised: 600,
-      },
-   ];
+   const [campaigns, setCampaigns] = useState([]);
+
+   // const campaigns = [
+   //    {
+   //       id: 1,
+   //       title: "Campaign 1",
+   //       category: "category",
+   //       description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+   //       target: 1000,
+   //       raised: 500,
+   //    },
+   //    {
+   //       id: 2,
+   //       title: "Campaign 2",
+   //       category: "category",
+   //       description: "Lorem ipsum dolor sit amet.",
+   //       target: 2500,
+   //       raised: 600,
+   //    },
+   //    {
+   //       id: 3,
+   //       title: "Campaign 3",
+   //       category: "category",
+   //       description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+   //       target: 800,
+   //       raised: 200,
+   //    },
+   //    {
+   //       id: 4,
+   //       title: "Campaign 4",
+   //       category: "category",
+   //       description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto omnis consequuntur ullam eveniet nulla recusandae fugit ducimus tempora cum velit!",
+   //       target: 1500,
+   //       raised: 600,
+   //    },
+   // ];
+
+   const getCampaigns = async () => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
+      try {
+         const { contract } = await initializeContract();
+
+         if (contract) {
+            const campaigns = await contract.getCampaigns();
+            setCampaigns(campaigns);
+            console.log(campaigns.length);
+         }
+      } catch (error) {
+         console.error("Error getting contract balance:", error);
+      }
+   };
+
+   useEffect(() => {
+      getCampaigns();
+      console.log("selesai");
+   }, []);
 
    return (
       <section id="campaign" className="mt-5">
