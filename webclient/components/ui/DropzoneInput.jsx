@@ -7,7 +7,7 @@ import { useCallback } from "react";
 export function DropzoneInput({ id, filesLength, setFiles, ...props }) {
    const onDrop = useCallback(
       acceptedFiles => {
-         if (acceptedFiles.length > 3 || files.length + acceptedFiles.length > 3) {
+         if (acceptedFiles.length > 3 || filesLength + acceptedFiles.length > 3) {
             alert("Anda hanya bisa meng-upload maksimal 3 file.");
             return;
          }
