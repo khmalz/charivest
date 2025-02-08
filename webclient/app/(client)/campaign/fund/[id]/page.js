@@ -6,16 +6,12 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 // import { ethers } from "ethers";
 import contract from "@/utils/contractUtils";
+import { progressTheme } from "@/components/theme/flowbiteTheme";
 
 export default function FundCampaign() {
    const { id } = useParams();
    const [clickOther, setClickOther] = useState(false);
    const [amountValue, setAmountValue] = useState("Other");
-
-   const progressTheme = {
-      label: "mb-1 flex justify-between font-medium dark:text-slate-200 text-slate-900",
-      bar: "space-x-2 rounded-full text-center font-medium leading-none text-cyan-200 dark:text-cyan-100",
-   };
 
    useEffect(() => {
       if (!window.ethereum) {
