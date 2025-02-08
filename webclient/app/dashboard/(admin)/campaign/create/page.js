@@ -7,7 +7,9 @@ export default function DashboardCreateCampaign() {
 
          <div className="mt-5 w-full shadow-lg dark:bg-dashboardsecondary p-5 rounded-lg flex flex-col space-y-5">
             <div className="flex">
-               <div className="w-full"></div>
+               <div className="w-full">
+                  <CreateCampaignForm />
+               </div>
             </div>
          </div>
       </div>

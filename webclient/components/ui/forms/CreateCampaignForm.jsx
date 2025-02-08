@@ -34,15 +34,25 @@ export default function CreateCampaignForm() {
          return;
       }
 
-      const formData = new FormData();
+      const campaignData = {
+         title: "",
+         description: "",
+         totalTarget: "",
+         deadline: "",
+         photos: [],
+      };
 
-      const title = formData.get("title");
-      const description = formData.get("description");
-      const totalTarget = ethers.parseEther("1.0");
-      const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+      try {
+         const formData = new FormData(e.target);
 
-      const uploadPhotos = await uploadImage();
-      const photos = uploadPhotos;
+         campaignData.title = formData.get("title");
+         campaignData.description = formData.get("description");
+         campaignData.totalTarget = ethers.parseEther("1.0");
+         campaignData.deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7;
+         campaignData.photos = await uploadImage();
+      } catch (error) {
+         console.error("error get data:", error);
+      }
 
       try {
          setIsLoading(true);
@@ -50,7 +60,7 @@ export default function CreateCampaignForm() {
          const { contract } = await initializeContract();
 
          if (contract) {
-            const txCampaign = await contract.createCampaign(title, description, totalTarget, deadline, photos);
+            const txCampaign = await contract.createCampaign(campaignData.title, campaignData.description, campaignData.totalTarget, campaignData.deadline, campaignData.photos);
             await txCampaign.wait();
 
             console.log("Campaign created");
