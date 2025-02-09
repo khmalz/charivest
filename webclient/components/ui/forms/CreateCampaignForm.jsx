@@ -11,6 +11,7 @@ import { useState } from "react";
 
 export default function CreateCampaignForm() {
    const [files, setFiles] = useState([]);
+   const [deadline, setDeadline] = useState(new Date(Date.now() + 86400000));
    const [isLoading, setIsLoading] = useState(false);
 
    const handleDelete = index => {
@@ -18,8 +19,8 @@ export default function CreateCampaignForm() {
    };
 
    const thumbs = files.map((fileWrapper, index) => (
-      <div key={index} className="relative py-2">
-         <button type="button" onClick={() => handleDelete(index)} className="absolute top-0 right-0 p-1 m-4 text-white rounded-full bg-gray-100/80 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-bg-gray-100/80">
+      <div key={index} className="relative py-2 w-56">
+         <button type="button" onClick={() => handleDelete(index)} className="absolute top-0 right-0 p-1 m-4 text-white rounded-full bg-gray-100/80 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-bg-gray-100/80 hover:bg-gray-100">
             <X className="text-black w-8" />
          </button>
          <Image src={fileWrapper.preview} width={128} height={128} alt={`image-preview-${index}`} className="w-56 h-56 object-cover rounded-md" />
@@ -48,7 +49,9 @@ export default function CreateCampaignForm() {
          campaignData.title = formData.get("title");
          campaignData.description = formData.get("description");
          campaignData.totalTarget = ethers.parseEther("1.0");
-         campaignData.deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7;
+
+         const dateDeadline = new Date(formData.get("deadline"));
+         campaignData.deadline = Math.floor(dateDeadline.getTime() / 1000);
          campaignData.photos = await uploadImage();
       } catch (error) {
          console.error("error get data:", error);
@@ -108,20 +111,30 @@ export default function CreateCampaignForm() {
                   <div className="mb-2 block">
                      <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
                   </div>
-                  <TextInput id="title" type="text" name="title" placeholder="Title" />
+                  <TextInput id="title" type="text" name="title" placeholder="Title" required />
                </div>
                <div>
                   <div className="mb-2 block">
                      <Label htmlFor="deadline" className="dark:text-white text-slate-800" value="Deadline" />
                   </div>
-                  <Datepicker language="id-ID" theme={datepickerTheme} labelTodayButton="Hari Ini" labelClearButton="Clear" minDate={new Date()} />
+                  <Datepicker
+                     language="id-ID"
+                     theme={datepickerTheme}
+                     name="deadline"
+                     labelTodayButton="Hari Ini"
+                     labelClearButton="Clear"
+                     minDate={new Date(Date.now() + 86400000)}
+                     value={deadline}
+                     onChange={(e, date) => setDeadline(date)}
+                     required
+                  />
                </div>
             </div>
             <div className="max-w-full">
                <div className="mb-2 block">
                   <Label htmlFor="description" value="Description" className="dark:text-white text-slate-800" />
                </div>
-               <Textarea id="description" placeholder="Leave a description..." rows={4} name="description" />
+               <Textarea id="description" placeholder="Leave a description..." rows={4} name="description" required />
             </div>
             <div>
                <div className="mb-2 block">
@@ -130,7 +143,7 @@ export default function CreateCampaignForm() {
 
                <DropzoneInput setFiles={setFiles} filesLength={files.length} />
 
-               {files.length > 0 && <div className="grid grid-cols-3 space-x-2 mt-2">{thumbs}</div>}
+               {files.length > 0 && <div className="flex space-x-4 mt-2">{thumbs}</div>}
             </div>
             <div className="flex justify-end mt-5">
                <Button color="light" isProcessing={isLoading} type="submit" className="border-none dark:hover:bg-slate-700 dark:bg-slate-800 max-w-28 md:max-w-32 w-full">

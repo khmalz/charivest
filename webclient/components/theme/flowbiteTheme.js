@@ -8,7 +8,16 @@ export const datepickerTheme = {
    popup: {
       footer: {
          button: {
-            today: "bg-primary text-white hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-primary",
+            today: "bg-primary text-white hover:bg-blue-900 dark:bg-cyan-600 dark:hover:bg-primary",
+         },
+      },
+   },
+   views: {
+      days: {
+         items: {
+            item: {
+               disabled: "!text-gray-500",
+            },
          },
       },
    },
