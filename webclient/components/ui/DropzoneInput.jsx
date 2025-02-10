@@ -53,7 +53,7 @@ export function DropzoneInput({ id, filesLength, setFiles, ...props }) {
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">SVG, PNG, or JPG (MAX. 3 files)</p>
                </div>
             </Label>
-            <input id={id} {...getInputProps()} {...props} className="hidden" required />
+            <input id={id} {...getInputProps()} {...props} className="hidden" />
          </div>
       </div>
    );

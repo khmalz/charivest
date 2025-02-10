@@ -5,13 +5,18 @@ import { DropzoneInput } from "@/components/ui/DropzoneInput";
 import { initializeContract } from "@/utils/contractUtils";
 import { ethers } from "ethers";
 import { Button, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
-import { X } from "lucide-react";
+import { DollarSignIcon, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 export default function CreateCampaignForm() {
+   const [forms, setForms] = useState({
+      title: "",
+      description: "",
+      amount: "",
+      deadline: new Date(Date.now() + 86400000),
+   });
    const [files, setFiles] = useState([]);
-   const [deadline, setDeadline] = useState(new Date(Date.now() + 86400000));
    const [isLoading, setIsLoading] = useState(false);
 
    const handleDelete = index => {
@@ -44,22 +49,23 @@ export default function CreateCampaignForm() {
       };
 
       try {
+         setIsLoading(true);
+
          const formData = new FormData(e.target);
 
          campaignData.title = formData.get("title");
          campaignData.description = formData.get("description");
-         campaignData.totalTarget = ethers.parseEther("1.0");
-
+         campaignData.totalTarget = ethers.parseEther(formData.get("amount"));
          const dateDeadline = new Date(formData.get("deadline"));
          campaignData.deadline = Math.floor(dateDeadline.getTime() / 1000);
          campaignData.photos = await uploadImage();
       } catch (error) {
          console.error("error get data:", error);
+      } finally {
+         setIsLoading(false);
       }
 
       try {
-         setIsLoading(true);
-
          const { contract } = await initializeContract();
 
          if (contract) {
@@ -67,6 +73,13 @@ export default function CreateCampaignForm() {
             await txCampaign.wait();
 
             console.log("Campaign created");
+            setForms({
+               title: "",
+               description: "",
+               amount: "",
+               deadline: "",
+            });
+            setFiles([]);
          }
       } catch (error) {
          console.error("Error getting contract balance:", error);
@@ -105,13 +118,21 @@ export default function CreateCampaignForm() {
 
    return (
       <form onSubmit={createCampaign}>
-         <div className="flex flex-col w-full mt-3 space-y-2">
+         <div className="flex flex-col w-full mt-3 space-y-3">
+            <div>
+               <div className="mb-2 block">
+                  <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
+               </div>
+               <TextInput id="title" type="text" name="title" value={forms.title} onInput={e => setForms({ ...forms, title: e.target.value })} placeholder="Title" required />
+            </div>
             <div className="grid sm:grid-cols-2 sm:gap-x-2 gap-y-2 sm:gap-y-0">
                <div>
                   <div className="mb-2 block">
-                     <Label htmlFor="title" className="dark:text-white text-slate-800" value="Title" />
+                     <Label htmlFor="amount" className="dark:text-white text-slate-800" value="Amount Target (in ETH)" />
                   </div>
-                  <TextInput id="title" type="text" name="title" placeholder="Title" required />
+                  <div className="w-full mt-2">
+                     <TextInput id="amount" type="number" value={forms.amount} onInput={e => setForms({ ...forms, amount: e.target.value })} icon={DollarSignIcon} rightIcon={DollarSignIcon} name="amount" placeholder="amount" required />
+                  </div>
                </div>
                <div>
                   <div className="mb-2 block">
@@ -124,8 +145,8 @@ export default function CreateCampaignForm() {
                      labelTodayButton="Hari Ini"
                      labelClearButton="Clear"
                      minDate={new Date(Date.now() + 86400000)}
-                     value={deadline}
-                     onChange={(e, date) => setDeadline(date)}
+                     value={forms.deadline}
+                     onChange={(_, date) => setForms({ ...forms, deadline: date })}
                      required
                   />
                </div>
@@ -134,7 +155,7 @@ export default function CreateCampaignForm() {
                <div className="mb-2 block">
                   <Label htmlFor="description" value="Description" className="dark:text-white text-slate-800" />
                </div>
-               <Textarea id="description" placeholder="Leave a description..." rows={4} name="description" required />
+               <Textarea id="description" placeholder="Leave a description..." value={forms.description} onInput={e => setForms({ ...forms, description: e.target.value })} rows={4} name="description" required />
             </div>
             <div>
                <div className="mb-2 block">
