@@ -4,6 +4,7 @@ import { initializeContract } from "@/utils/contractUtils";
 import { ethers } from "ethers";
 import { Button, Progress } from "flowbite-react";
 import { BadgeDollarSign } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -56,16 +57,19 @@ export default function Campaign() {
 
          if (contract) {
             const campaignsData = await contract.getCampaigns();
-            const formattedData = campaignsData.map(campaign => ({
-               creator: campaign.creator,
-               title: campaign.title,
-               description: campaign.description,
-               totalTarget: ethers.formatEther(campaign.totalTarget),
-               deadline: campaign.deadline,
-               photos: campaign.photos,
-            }));
 
-            setCampaigns(formattedData);
+            if (campaignsData) {
+               const formattedData = campaignsData.map(campaign => ({
+                  creator: campaign.creator,
+                  title: campaign.title,
+                  description: campaign.description,
+                  totalTarget: ethers.formatEther(campaign.totalTarget),
+                  deadline: Number(campaign.deadline) * 1000,
+                  photos: campaign.photos,
+               }));
+
+               setCampaigns(formattedData);
+            }
          }
       } catch (error) {
          console.error("Error getting contract balance:", error);
@@ -87,17 +91,17 @@ export default function Campaign() {
                   campaigns.map((item, index) => (
                      <div key={index} className="group flex max-w-md flex-col justify-between overflow-hidden rounded-lg dark:bg-slate-700 dark:shadow shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-102">
                         <div>
-                           <div className="flex h-52 w-auto items-center justify-center bg-gray-400">
+                           {/* <div className="flex h-52 w-auto items-center justify-center bg-gray-400">
                               <svg className="h-10 w-10 text-gray-200 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
                                  <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
                               </svg>
+                           </div> */}
+                           <div className="h-52 w-auto overflow-hidden">
+                              <Image width={500} height={500} className="w-full rounded-t-lg" src={item.photos[0]} alt={item.title} />
                            </div>
                            <div className="p-5">
                               <h5 className="text-2xl font-bold capitalize text-slate-900 tracking-tight dark:text-slate-200">{item.title}</h5>
-                              <div className="my-3">
-                                 <span className="mr-2 inline-flex cursor-pointer items-center rounded-full bg-primary text-white dark:bg-gray-100 px-2.5 py-0.5 text-xs font-medium dark:text-gray-800 hover:bg-gray-200/90">{item.category}</span>
-                              </div>
-                              <p className="text-sm font-normal dark:text-slate-200 text-slate-900 md:text-base mb-5">{item.description}</p>
+                              <p className="text-sm font-normal dark:text-slate-200 text-slate-900 md:text-base mb-5 mt-3">{item.description}</p>
                            </div>
                         </div>
                         <div>
@@ -112,7 +116,13 @@ export default function Campaign() {
                               <h6 className="dark:text-slate-200 text-slate-900 font-semibold text-sm md:text-base mt-1">Goal ${item.totalTarget}</h6>
                            </div>
                            <div className="flex space-x-3 px-5 pb-4 pt-2 items-center justify-between">
-                              <p className="text-sm text-slate-500 dark:text-blue-200">2 Jan 2025</p>
+                              <p className="text-sm text-slate-500 dark:text-blue-200">
+                                 {new Date(item.deadline).toLocaleDateString("en-US", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                 })}
+                              </p>
                               <Button size="sm" as={Link} href={`/campaign/fund/${index}`} className="dark:hover:!bg-cyan-700 hover:!bg-cyan-800">
                                  <div className="flex items-center justify-center">
                                     <BadgeDollarSign className="mr-2 h-5 w-5" />
