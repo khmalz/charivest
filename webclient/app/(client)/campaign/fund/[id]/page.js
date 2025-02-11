@@ -4,14 +4,15 @@ import { Button, Checkbox, Label, Progress, Radio, TextInput } from "flowbite-re
 import { DollarSignIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-// import { ethers } from "ethers";
-import contract from "@/utils/contractUtils";
+import { initializeContract } from "@/utils/contractUtils";
 import { progressTheme } from "@/components/theme/flowbiteTheme";
+import { ethers } from "ethers";
 
 export default function FundCampaign() {
    const { id } = useParams();
    const [clickOther, setClickOther] = useState(false);
    const [amountValue, setAmountValue] = useState("Other");
+   const [campaign, setCampaign] = useState({});
 
    useEffect(() => {
       if (!window.ethereum) {
@@ -25,34 +26,69 @@ export default function FundCampaign() {
       setClickOther(value === "Other");
    };
 
-   // const connectAndFund = async () => {
-   //   if (!window.ethereum) return alert("MetaMask not found!");
+   const getDetailCampaign = async () => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
 
-   //   try {
-   //     const provider = new ethers.BrowserProvider(window.ethereum);
-   //     await provider.send("eth_requestAccounts", []);
-   //     const signer = await provider.getSigner();
-   //     const contractWithSigner = contract.connect(signer);
+      const { contract } = await initializeContract();
 
-   //     const amountInWei = ethers.parseEther(amountValue || "0");
-   //     const tx = await contractWithSigner.donate(id, { value: amountInWei });
+      if (contract) {
+         const campaignDetail = await contract.getDetailCampaign(id);
 
-   //     alert("Donation transaction sent!");
-   //     await tx.wait();
-   //     alert("Donation successful!");
-   //   } catch (err) {
-   //     console.error("Error donating:", err);
-   //     alert("Donation failed!");
-   //   }
-   // };
+         if (campaignDetail) {
+            setCampaign({
+               creator: campaignDetail.creator,
+               title: campaignDetail.title,
+               description: campaignDetail.description,
+               target: ethers.formatEther(campaignDetail.totalTarget),
+               deadline: Number(campaignDetail.deadline) * 1000,
+               totalFunds: ethers.formatEther(campaignDetail.totalFunds),
+            });
+         }
+      }
+   };
+
+   const handleDonation = async () => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
+      const { contract } = await initializeContract();
+
+      if (contract) {
+         const amountInWei = ethers.parseEther(amountValue || "0");
+         const tx = await contract.donate(id, { value: amountInWei });
+
+         alert("Donation transaction sent!");
+         await tx.wait();
+         alert("Donation successful!");
+
+         getDetailCampaign();
+      }
+   };
+
+   useEffect(() => {
+      getDetailCampaign();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    return (
       <section id="fund" className="mt-5">
          <div>
-            <h3 className="text-2xl font-bold dark:text-white text-slate-900 sm:text-3xl mt-5">Fund Campaign {id}</h3>
+            <h3 className="text-2xl font-bold dark:text-white text-slate-900 sm:text-3xl mt-5">Fund Campaign</h3>
+
+            <div className="my-3">
+               <h5 className="font-bold dark:text-white text-slate-900 text-xl">
+                  {campaign.title} by {campaign.creator}
+               </h5>
+            </div>
 
             <div className="mt-5">
-               <Progress theme={progressTheme} progress={45} progressLabelPosition="inside" textLabel="Campaign Goal: $1000" textLabelPosition="outside" size="lg" labelProgress labelText />
+               <p className="mb-1">Campaign Raised: {campaign.totalFunds} ETH</p>
+               <Progress theme={progressTheme} progress={campaign.target / campaign.totalFunds} progressLabelPosition="inside" textLabel={`Campaign Goal: ${campaign.target} ETH`} textLabelPosition="outside" size="lg" labelProgress labelText />
             </div>
 
             <div className="mt-5">
@@ -126,7 +162,7 @@ export default function FundCampaign() {
             </div>
 
             <div className="mt-5">
-               <Button>Fund {amountValue != "Other" ? `$${amountValue}` : ""}</Button>
+               <Button onClick={handleDonation}>Fund {amountValue != "Other" ? `$${amountValue}` : ""}</Button>
             </div>
          </div>
       </section>
