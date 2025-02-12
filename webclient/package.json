@@ -7,7 +7,10 @@
       "build": "next build",
       "start": "next start",
       "lint": "next lint",
-      "fresh-db": "node ./migrations/drop.js && node ./migrations/init.js"
+      "db:help": "node ./migrations/db.js db:help",
+      "db:migrate": "node ./migrations/db.js db:migrate",
+      "db:fresh": "node ./migrations/db.js db:fresh",
+      "db:fresh-seed": "node ./migrations/db.js db:fresh --seed"
    },
    "dependencies": {
       "@metamask/sdk-react": "^0.32.0",

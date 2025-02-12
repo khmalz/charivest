@@ -1,8 +1,8 @@
 const { openDB } = require("../lib/database.js");
 
 async function createTables() {
-  const db = await openDB();
-  await db.exec(`
+   const db = await openDB();
+   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       address TEXT NOT NULL UNIQUE,
@@ -16,7 +16,7 @@ async function createTables() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
-  console.log("Database tables created");
+   console.log("Database tables created");
 }
 
 createTables();
