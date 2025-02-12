@@ -7,7 +7,10 @@
       "build": "next build",
       "start": "next start",
       "lint": "next lint",
-      "fresh-db": "node ./migrations/drop.js && node ./migrations/init.js"
+      "db:help": "node ./migrations/db.js db:help",
+      "db:migrate": "node ./migrations/db.js db:migrate",
+      "db:fresh": "node ./migrations/db.js db:fresh",
+      "db:fresh-seed": "node ./migrations/db.js db:fresh --seed"
    },
    "dependencies": {
       "@metamask/sdk-react": "^0.32.0",
@@ -18,6 +21,7 @@
       "jsonwebtoken": "^9.0.2",
       "jwt-decode": "^4.0.0",
       "lucide-react": "^0.474.0",
+      "mime": "^4.0.6",
       "next": "15.1.6",
       "next-connect": "^1.0.0",
       "react": "^19.0.0",

@@ -2,11 +2,28 @@
 
 import { useDropzone } from "react-dropzone";
 import { Label } from "flowbite-react";
+import { useCallback } from "react";
 
-export function DropzoneInput({ id, onDrop, ...props }) {
+export function DropzoneInput({ id, filesLength, setFiles, ...props }) {
+   const onDrop = useCallback(
+      acceptedFiles => {
+         if (acceptedFiles.length > 3 || filesLength + acceptedFiles.length > 3) {
+            alert("Anda hanya bisa meng-upload maksimal 3 file.");
+            return;
+         }
+
+         const mappedFiles = acceptedFiles.map(file => ({
+            file,
+            preview: URL.createObjectURL(file),
+         }));
+         setFiles(prev => [...prev, ...mappedFiles]);
+      },
+      [filesLength]
+   );
+
    const { getRootProps, getInputProps, isDragActive } = useDropzone({
       onDrop,
-      accept: "image/*",
+      accept: { "image/*": [".jpeg", ".jpg", ".png"] },
       multiple: true,
    });
 

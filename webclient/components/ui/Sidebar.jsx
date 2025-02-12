@@ -6,6 +6,7 @@ import { HiClock, HiUser, HiViewBoards, HiViewGrid } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { sidebarTheme } from "../theme/flowbiteTheme";
 
 function contentSidebar() {
    const pathname = usePathname();
@@ -36,12 +37,6 @@ function contentSidebar() {
       </>
    );
 }
-
-const sidebarTheme = {
-   root: {
-      inner: "h-full overflow-y-auto overflow-x-hidden rounded shadow-lg dark:shadow-slate-900 px-3 py-4 bg-slate-200 dark:!bg-dashboardprimary",
-   },
-};
 
 export function SidebarDashboard() {
    return (

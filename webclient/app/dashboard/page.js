@@ -1,37 +1,17 @@
 "use client";
 
+import { cardThemeDashboard, tableThemeDashboard } from "@/components/theme/flowbiteTheme";
 import { Card, Table } from "flowbite-react";
 import { HiCollection, HiCurrencyDollar, HiUserCircle } from "react-icons/hi";
 
 export default function Dashboard() {
-   const cardTheme = {
-      root: {
-         base: "flex flex-row rounded-xl w-full border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 md:max-w-md w-full",
-         children: "flex h-full flex-col justify-start gap-4 p-6",
-      },
-   };
-
-   const tableTheme = {
-      body: {
-         base: "group/body",
-         cell: {
-            base: "px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg",
-         },
-      },
-      head: {
-         cell: {
-            base: "bg-gray-50 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-transparent",
-         },
-      },
-   };
-
    return (
       <section id="dashboard">
          <div>
             <h1 className="text-2xl font-bold">Dashboard Page</h1>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-5">
-               <Card theme={cardTheme}>
+               <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
                      <span>
                         <HiCollection className="text-gray-700 dark:text-gray-400 w-5 h-5" />
@@ -40,7 +20,7 @@ export default function Dashboard() {
                   </div>
                   <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">250</p>
                </Card>
-               <Card theme={cardTheme}>
+               <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
                      <span>
                         <HiCollection className="text-gray-700 dark:text-gray-400 w-5 h-5" />
@@ -49,7 +29,7 @@ export default function Dashboard() {
                   </div>
                   <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">250</p>
                </Card>
-               <Card theme={cardTheme}>
+               <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
                      <span>
                         <HiUserCircle className="text-gray-700 dark:text-gray-400 w-5 h-5" />
@@ -58,7 +38,7 @@ export default function Dashboard() {
                   </div>
                   <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">190</p>
                </Card>
-               <Card theme={cardTheme}>
+               <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
                      <span>
                         <HiCurrencyDollar className="text-gray-700 dark:text-gray-400 w-5 h-5" />
@@ -73,7 +53,7 @@ export default function Dashboard() {
                <Card className="w-full md:w-1/2">
                   <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">New Campaign</h5>
                   <div className="overflow-x-auto">
-                     <Table theme={tableTheme}>
+                     <Table theme={tableThemeDashboard}>
                         <Table.Head>
                            <Table.HeadCell>Title</Table.HeadCell>
                            <Table.HeadCell>Deadline</Table.HeadCell>

@@ -1,3 +1,4 @@
+import { cardThemeClient } from "@/components/theme/flowbiteTheme";
 import { Card } from "flowbite-react";
 import { BanknoteIcon, CalendarIcon, UserRound } from "lucide-react";
 
@@ -53,13 +54,6 @@ export default function DashboardCampaignHistory() {
       },
    ];
 
-   const cardTheme = {
-      root: {
-         base: "flex flex-row rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 max-w-md w-full",
-         children: "flex h-full flex-col justify-start gap-4 p-6",
-      },
-   };
-
    return (
       <div>
          <div>
@@ -70,7 +64,7 @@ export default function DashboardCampaignHistory() {
          <div className="flex w-full">
             <div className="mt-5 grid grid-cols-1 gap-4 w-full sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
                {campaigns.map(item => (
-                  <Card theme={cardTheme} key={item.id}>
+                  <Card theme={cardThemeClient} key={item.id}>
                      <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{item.title}</h5>
                      <div className="flex w-full items-center gap-x-3">
                         <div className="flex items-center gap-x-2">

@@ -1,21 +1,12 @@
 "use client";
 
+import { datepickerTheme } from "@/components/theme/flowbiteTheme";
 import { DropzoneInput } from "@/components/ui/DropzoneInput";
 import { Button, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
-
-const datepickerTheme = {
-   popup: {
-      footer: {
-         button: {
-            today: "bg-primary text-white hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-primary",
-         },
-      },
-   },
-};
 
 export default function DashboardEditCampaign() {
    const [files, setFiles] = useState([]);

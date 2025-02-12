@@ -1,5 +1,6 @@
 "use client";
 
+import { tableThemeClient } from "@/components/theme/flowbiteTheme";
 import { Pagination, Table } from "flowbite-react";
 import { useState } from "react";
 
@@ -75,26 +76,13 @@ export default function Leaderboard() {
       },
    ];
 
-   const tableTheme = {
-      body: {
-         cell: {
-            base: "px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg dark:bg-slate-700",
-         },
-      },
-      head: {
-         cell: {
-            base: "bg-gray-50 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-gray-600",
-         },
-      },
-   };
-
    return (
       <section id="leaderbord" className="mt-5">
          <div>
             <h2 className="text-2xl font-bold dark:text-white text-slate-900 sm:text-4xl text-center">Leaderboard</h2>
 
             <div className="overflow-x-auto mt-5">
-               <Table theme={tableTheme}>
+               <Table theme={tableThemeClient}>
                   <Table.Head>
                      <Table.HeadCell>Rank</Table.HeadCell>
                      <Table.HeadCell>Name</Table.HeadCell>
