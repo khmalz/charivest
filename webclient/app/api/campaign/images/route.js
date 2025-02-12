@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { join } from "path";
-import { stat, writeFile, mkdir } from "fs/promises";
+import { stat, writeFile, mkdir, unlink } from "fs/promises";
 import mime from "mime";
 
 export async function POST(req) {
@@ -39,5 +39,25 @@ export async function POST(req) {
    } catch (e) {
       console.error("Error while trying to upload files", e);
       return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
+   }
+}
+
+export async function DELETE(req) {
+   try {
+      const { imageUrls } = await req.json();
+
+      if (!imageUrls || !Array.isArray(imageUrls)) {
+         return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+      }
+
+      for (const url of imageUrls) {
+         const filePath = join(process.cwd(), "public", url);
+         await unlink(filePath);
+      }
+
+      return NextResponse.json({ success: true }, { status: 200 });
+   } catch (error) {
+      console.error("Error deleting images:", error);
+      return NextResponse.json({ error: "Failed to delete images" }, { status: 500 });
    }
 }

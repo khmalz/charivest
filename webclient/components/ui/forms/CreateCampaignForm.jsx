@@ -82,6 +82,10 @@ export default function CreateCampaignForm() {
             setFiles([]);
          }
       } catch (error) {
+         if (campaignData.photos.length > 0) {
+            await deleteUploadedImages(campaignData.photos);
+         }
+
          console.error("Error getting contract balance:", error);
       } finally {
          setIsLoading(false);
@@ -113,6 +117,23 @@ export default function CreateCampaignForm() {
          return [];
       } finally {
          setIsLoading(false);
+      }
+   };
+
+   const deleteUploadedImages = async imageUrls => {
+      try {
+         const response = await fetch("/api/campaign/images", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageUrls }),
+         });
+
+         const result = await response.json();
+         if (!response.ok) {
+            console.error("Failed to delete images:", result.error);
+         }
+      } catch (error) {
+         console.error("Error deleting images:", error);
       }
    };
 
