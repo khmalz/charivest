@@ -1,6 +1,5 @@
 import { Button, Progress } from "flowbite-react";
-import { BadgeDollarSign, Pen, Trash } from "lucide-react";
-import Link from "next/link";
+import { Trash } from "lucide-react";
 
 export default function DashboardCampaign() {
    const campaigns = [
@@ -75,12 +74,7 @@ export default function DashboardCampaign() {
                         </div>
                         <div className="flex space-x-3 px-5 pb-4 pt-2 items-center justify-between">
                            <p className="text-xs text-slate-500 dark:text-blue-200">2 Jan 2025</p>
-                           <div className="flex items-center gap-1">
-                              <Button size="xs" as={Link} href={`/dashboard/campaign/${item.id}/edit`} className="dark:hover:!bg-cyan-700 hover:!bg-cyan-800">
-                                 <div className="flex items-center justify-center">
-                                    <Pen className="h-4 w-4" />
-                                 </div>
-                              </Button>
+                           <div>
                               <Button size="xs" color="failure">
                                  <div className="flex items-center justify-center">
                                     <Trash className="h-4 w-4" />
