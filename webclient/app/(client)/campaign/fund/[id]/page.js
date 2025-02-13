@@ -5,7 +5,7 @@ import { DollarSignIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { initializeContract } from "@/utils/contractUtils";
-import { progressTheme } from "@/components/theme/flowbiteTheme";
+import { progressTheme } from "@/helpers/theme/flowbiteTheme";
 import { ethers } from "ethers";
 import { isAddressNull } from "@/helpers/utils";
 

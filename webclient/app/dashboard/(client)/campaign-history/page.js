@@ -1,4 +1,4 @@
-import { cardThemeClient } from "@/components/theme/flowbiteTheme";
+import { cardThemeClient } from "@/helpers/theme/flowbiteTheme";
 import { Card } from "flowbite-react";
 import { BanknoteIcon, CalendarIcon, UserRound } from "lucide-react";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "flowbite-react";
-import { cardThemeDashboard } from "../theme/flowbiteTheme";
+import { cardThemeDashboard } from "../../helpers/theme/flowbiteTheme";
 
 export default function StatCard({ icon: Icon, title, value, unit }) {
    return (

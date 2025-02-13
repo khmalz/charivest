@@ -6,7 +6,7 @@ import { HiClock, HiUser, HiViewBoards, HiViewGrid } from "react-icons/hi";
 import { useDrawer } from "../hooks/useDrawer";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { sidebarTheme } from "../theme/flowbiteTheme";
+import { sidebarTheme } from "../../helpers/theme/flowbiteTheme";
 
 function contentSidebar() {
    const pathname = usePathname();
