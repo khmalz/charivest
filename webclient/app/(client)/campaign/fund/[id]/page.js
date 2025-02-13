@@ -16,48 +16,10 @@ export default function FundCampaign() {
    const [campaign, setCampaign] = useState({});
    const [isConnected, setIsConnected] = useState(true);
 
-   useEffect(() => {
-      if (!window.ethereum) {
-         alert("Please install MetaMask!");
-      }
-
-      if (isAddressNull()) {
-         setIsConnected(false);
-         return;
-      } else setIsConnected(true);
-   }, []);
-
    const handleRadioChange = e => {
       const value = e.target.value;
       setAmountValue(value);
       setClickOther(value === "Other");
-   };
-
-   const getDetailCampaign = async () => {
-      if (!window.ethereum) {
-         alert("MetaMask is not installed. Please install it to use this feature.");
-         return;
-      }
-
-      const { contract } = await initializeContract();
-
-      if (contract) {
-         const campaignDetail = await contract.getDetailCampaign(id);
-
-         if (campaignDetail) {
-            const campaignData = {
-               creator: campaignDetail.creator,
-               title: campaignDetail.title,
-               completed: campaignDetail.isCompleted,
-               description: campaignDetail.description,
-               totalTarget: ethers.formatEther(campaignDetail.totalTarget),
-               totalFunds: ethers.formatEther(campaignDetail.totalFunds),
-               deadline: Number(campaignDetail.deadline) * 1000,
-            };
-
-            setCampaign(campaignData);
-         }
-      }
    };
 
    const handleDonation = async () => {
@@ -81,9 +43,44 @@ export default function FundCampaign() {
    };
 
    useEffect(() => {
-      getDetailCampaign();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (!window.ethereum) {
+         alert("Please install MetaMask!");
+      }
+
+      if (isAddressNull()) {
+         setIsConnected(false);
+         return;
+      } else setIsConnected(true);
    }, []);
+
+   useEffect(() => {
+      const getDetailCampaign = async () => {
+         if (!window.ethereum) {
+            alert("MetaMask is not installed. Please install it to use this feature.");
+            return;
+         }
+
+         const { contract } = await initializeContract();
+
+         if (contract) {
+            const campaignDetail = await contract.getDetailCampaign(id);
+
+            if (campaignDetail) {
+               const campaignData = {
+                  creator: campaignDetail.creator,
+                  title: campaignDetail.title,
+                  completed: campaignDetail.isCompleted,
+                  totalTarget: ethers.formatEther(campaignDetail.totalTarget),
+                  totalFunds: ethers.formatEther(campaignDetail.totalFunds),
+               };
+
+               setCampaign(campaignData);
+            }
+         }
+      };
+
+      getDetailCampaign();
+   }, [id]);
 
    return (
       <section id="fund" className="mt-5">
