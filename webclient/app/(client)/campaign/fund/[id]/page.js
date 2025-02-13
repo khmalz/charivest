@@ -45,15 +45,17 @@ export default function FundCampaign() {
          const campaignDetail = await contract.getDetailCampaign(id);
 
          if (campaignDetail) {
-            setCampaign({
+            const campaignData = {
                creator: campaignDetail.creator,
                title: campaignDetail.title,
-               completed: campaign.isCompleted,
+               completed: campaignDetail.isCompleted,
                description: campaignDetail.description,
-               target: ethers.formatEther(campaignDetail.totalTarget),
+               totalTarget: ethers.formatEther(campaignDetail.totalTarget),
                totalFunds: ethers.formatEther(campaignDetail.totalFunds),
                deadline: Number(campaignDetail.deadline) * 1000,
-            });
+            };
+
+            setCampaign(campaignData);
          }
       }
    };
@@ -99,9 +101,9 @@ export default function FundCampaign() {
                   <p className="mb-1">Campaign Raised: {campaign.totalFunds} ETH</p>
                   <Progress
                      theme={progressTheme}
-                     progress={(campaign.target / campaign.totalFunds) * 100}
+                     progress={parseInt((parseFloat(campaign.totalFunds) / parseFloat(campaign.totalTarget)) * 100)}
                      progressLabelPosition="inside"
-                     textLabel={`Campaign Goal: ${campaign.target} ETH`}
+                     textLabel={`Campaign Goal: ${campaign.totalTarget} ETH`}
                      textLabelPosition="outside"
                      size="lg"
                      labelProgress
@@ -109,7 +111,7 @@ export default function FundCampaign() {
                   />
                </div>
 
-               {campaign.completed ? (
+               {!(campaign.completed == true) ? (
                   <div id="form">
                      <div className="mt-5">
                         <legend className="md:text-base text-sm dark:text-slate-200 text-slate-900">Choose an amount</legend>

@@ -1,10 +1,67 @@
 "use client";
 
-import { cardThemeDashboard, tableThemeDashboard } from "@/components/theme/flowbiteTheme";
-import { Card, Table } from "flowbite-react";
+import { cardThemeDashboard } from "@/components/theme/flowbiteTheme";
+import { initializeContract } from "@/utils/contractUtils";
+import { ethers } from "ethers";
+import { Card } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { HiCollection, HiCurrencyDollar, HiUserCircle } from "react-icons/hi";
 
 export default function Dashboard() {
+   const [stats, setStats] = useState({
+      campaignActive: 0,
+      campaignEnded: 0,
+      donor: 0,
+      fund: 0,
+   });
+
+   const fetchCampaignAndDonationStats = async () => {
+      try {
+         const { contract } = await initializeContract();
+
+         if (!contract) return;
+
+         const campaignsData = await contract.getCampaigns();
+
+         let campaignActive = 0;
+         let campaignEnded = 0;
+
+         if (campaignsData.length > 0) {
+            campaignActive = campaignsData.filter(c => !c.isCompleted).length;
+            campaignEnded = campaignsData.filter(c => c.isCompleted).length;
+         }
+
+         const filter = contract.filters.DonationReceived();
+         const events = await contract.queryFilter(filter);
+
+         let donorsSet = new Set();
+         let totalAmount = BigInt(0);
+
+         if (events.length > 0) {
+            events.forEach(event => {
+               if (event.args?.length >= 3) {
+                  const [, donor, amount] = event.args;
+                  donorsSet.add(donor);
+                  totalAmount += BigInt(amount);
+               }
+            });
+         }
+
+         setStats({
+            campaignActive,
+            campaignEnded,
+            donor: donorsSet.size,
+            fund: ethers.formatEther(totalAmount.toString()),
+         });
+      } catch (error) {
+         console.info("Error fetching campaign and donation stats:", error);
+      }
+   };
+
+   useEffect(() => {
+      fetchCampaignAndDonationStats();
+   }, []);
+
    return (
       <section id="dashboard">
          <div>
@@ -18,7 +75,7 @@ export default function Dashboard() {
                      </span>
                      <h5 className="font-bold text-sm sm:text-base text-gray-700 dark:text-gray-400">Campaign Active</h5>
                   </div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">250</p>
+                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">{stats.campaignActive}</p>
                </Card>
                <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
@@ -27,7 +84,7 @@ export default function Dashboard() {
                      </span>
                      <h5 className="font-bold text-sm sm:text-base text-gray-700 dark:text-gray-400">Campaign Ended</h5>
                   </div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">250</p>
+                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">{stats.campaignEnded}</p>
                </Card>
                <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
@@ -36,7 +93,7 @@ export default function Dashboard() {
                      </span>
                      <h5 className="font-bold text-sm sm:text-base text-gray-700 dark:text-gray-400">Donor</h5>
                   </div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">190</p>
+                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">{stats.donor}</p>
                </Card>
                <Card theme={cardThemeDashboard}>
                   <div className="flex items-center space-x-1">
@@ -45,39 +102,7 @@ export default function Dashboard() {
                      </span>
                      <h5 className="font-bold text-sm sm:text-base text-gray-700 dark:text-gray-400">Fund</h5>
                   </div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">$25000</p>
-               </Card>
-            </div>
-
-            <div className="mt-5 flex gap-x-3 w-full">
-               <Card className="w-full md:w-1/2">
-                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">New Campaign</h5>
-                  <div className="overflow-x-auto">
-                     <Table theme={tableThemeDashboard}>
-                        <Table.Head>
-                           <Table.HeadCell>Title</Table.HeadCell>
-                           <Table.HeadCell>Deadline</Table.HeadCell>
-                           <Table.HeadCell>Target</Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                           <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{'Apple MacBook Pro 17"'}</Table.Cell>
-                              <Table.Cell>20 Nov 2022</Table.Cell>
-                              <Table.Cell>$2999</Table.Cell>
-                           </Table.Row>
-                           <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">Microsoft Surface Pro</Table.Cell>
-                              <Table.Cell>18 Dec 2022</Table.Cell>
-                              <Table.Cell>$1999</Table.Cell>
-                           </Table.Row>
-                           <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">Magic Mouse 2</Table.Cell>
-                              <Table.Cell>21 Jan 2023</Table.Cell>
-                              <Table.Cell>$99</Table.Cell>
-                           </Table.Row>
-                        </Table.Body>
-                     </Table>
-                  </div>
+                  <p className="font-semibold text-gray-900 dark:text-white text-lg md:text-2xl">{stats.fund} ETH</p>
                </Card>
             </div>
          </div>
