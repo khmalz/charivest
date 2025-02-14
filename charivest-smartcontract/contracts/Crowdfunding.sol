@@ -6,7 +6,8 @@ import "./RewardPointsLib.sol";
 contract Crowdfunding {
     using RewardPointsLib for uint256;
 
-    address public admin;
+    // admin = creator
+    address payable public admin;
 
     struct Campaign {
         bytes32 id;
@@ -16,6 +17,7 @@ contract Crowdfunding {
         uint256 totalTarget;
         uint256 totalFunds;
         bool isCompleted;
+        bool isWithdrawn;
         uint256 deadline;
         string proofOfFundUse;
         bool proofSubmitted;
@@ -26,6 +28,7 @@ contract Crowdfunding {
 
     mapping(bytes32 => Campaign) private campaigns;
     bytes32[] private campaignIds;
+    bytes32[] private hasWithdrawn;
 
     mapping(address => uint256) private rewardPoints;
     mapping(address => uint256) public totalDonations;
@@ -41,12 +44,17 @@ contract Crowdfunding {
         uint256 amount
     );
     event CampaignCompleted(bytes32 campaignId);
+    event CampaignWithdrawn(bytes32 campaignId, uint256 amount);
     event ProofSubmitted(bytes32 campaignId, string proofOfFundUse);
-    event PhotoAdded(bytes32 campaignId, string photoURL);
     event RewardPointsGranted(address indexed donor, uint256 points);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only admin can create campaigns");
+        _;
+    }
+
+    modifier onlyCreator(bytes32 id) {
+        require(msg.sender == campaigns[id].creator, "Only creator");
         _;
     }
 
@@ -56,7 +64,7 @@ contract Crowdfunding {
     }
 
     constructor() {
-        admin = msg.sender;
+        admin = payable(msg.sender);
     }
 
     function createCampaign(
@@ -79,6 +87,7 @@ contract Crowdfunding {
         newCampaign.description = description;
         newCampaign.totalTarget = totalTarget;
         newCampaign.isCompleted = false;
+        newCampaign.isWithdrawn = false;
         newCampaign.deadline = deadline;
         newCampaign.photos = photos;
 
@@ -117,6 +126,26 @@ contract Crowdfunding {
         emit DonationReceived(campaignId, msg.sender, msg.value);
     }
 
+    function withDraw(
+        bytes32 campaignId
+    ) public onlyCreator(campaignId) campaignExists(campaignId) {
+        Campaign storage campaign = campaigns[campaignId];
+        require(
+            msg.sender == campaign.creator,
+            "Only campaign creator can withdraw"
+        );
+        require(!campaign.isCompleted, "Campaign must be completed first");
+
+        uint256 amount = campaign.totalFunds;
+        campaign.totalFunds = 0;
+        campaign.isWithdrawn = true;
+
+        admin.transfer(amount);
+
+        hasWithdrawn.push(campaignId);
+        emit CampaignWithdrawn(campaignId, amount);
+    }
+
     function submitProofOfFundUse(
         bytes32 campaignId,
         string memory proofURI
@@ -137,21 +166,6 @@ contract Crowdfunding {
         campaign.proofSubmitted = true;
 
         emit ProofSubmitted(campaignId, proofURI);
-    }
-
-    function addPhotoToCampaign(
-        bytes32 campaignId,
-        string memory photoURL
-    ) public campaignExists(campaignId) {
-        Campaign storage campaign = campaigns[campaignId];
-        require(
-            msg.sender == campaign.creator,
-            "Only the creator can add photos"
-        );
-
-        campaign.photos.push(photoURL);
-
-        emit PhotoAdded(campaignId, photoURL);
     }
 
     function getRewardPoints(address user) public view returns (uint256) {

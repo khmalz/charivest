@@ -81,6 +81,38 @@ describe("Crowdfunding Contract", function () {
       expect(campaignDetails.proofOfFundUse).to.equal(proofURI);
    });
 
+   it("should be able to withdraw", async function () {
+      const totalTarget = ethers.parseEther("1.0");
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+      const photos = [];
+      const id = ethers.keccak256(ethers.solidityPacked(["string", "uint256"], ["Test", deadline]));
+
+      await crowdfunding.createCampaign(id, "Test", "Test", totalTarget, deadline, photos);
+
+      const donationAmount = ethers.parseEther("0.5");
+      await crowdfunding.connect(addr1).donate(id, { value: donationAmount });
+
+      await crowdfunding.connect(deployer).withDraw(id);
+
+      const campaignDetails = await crowdfunding.getDetailCampaign(id);
+      expect(campaignDetails.totalFunds).to.equal(0);
+      expect(campaignDetails.isWithdrawn).to.equal(true);
+   });
+
+   it("revert if withdrawal is called by non-creator", async function () {
+      const totalTarget = ethers.parseEther("1.0");
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+      const photos = [];
+      const id = ethers.keccak256(ethers.solidityPacked(["string", "uint256"], ["Test", deadline]));
+
+      await crowdfunding.createCampaign(id, "Test", "Test", totalTarget, deadline, photos);
+
+      const donationAmount = ethers.parseEther("0.5");
+      await crowdfunding.connect(addr1).donate(id, { value: donationAmount });
+
+      await expect(crowdfunding.connect(addr1).withDraw(id)).to.be.revertedWith("Only creator");
+   });
+
    it("return reward points", async function () {
       const totalTarget = ethers.parseEther("1.0");
       const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
