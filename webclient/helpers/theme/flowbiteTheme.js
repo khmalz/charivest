@@ -77,3 +77,19 @@ export const cardThemeClient = {
       children: baseCardStyle.children,
    },
 };
+
+export const tabsTheme = {
+   tablist: {
+      tabitem: {
+         variant: {
+            pills: {
+               base: "focus:ring-0 py-3",
+               active: {
+                  on: "rounded-lg bg-cyan-600 text-white",
+                  off: "rounded-lg hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white",
+               },
+            },
+         },
+      },
+   },
+};
