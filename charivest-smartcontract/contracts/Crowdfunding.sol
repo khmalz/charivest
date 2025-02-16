@@ -41,7 +41,8 @@ contract Crowdfunding {
     event DonationReceived(
         bytes32 campaignId,
         address indexed donor,
-        uint256 amount
+        uint256 amount,
+        uint256 donation_at
     );
     event CampaignCompleted(bytes32 campaignId);
     event CampaignWithdrawn(bytes32 campaignId, uint256 amount);
@@ -123,7 +124,12 @@ contract Crowdfunding {
         rewardPoints[msg.sender] += points;
 
         emit RewardPointsGranted(msg.sender, points);
-        emit DonationReceived(campaignId, msg.sender, msg.value);
+        emit DonationReceived(
+            campaignId,
+            msg.sender,
+            msg.value,
+            block.timestamp
+        );
     }
 
     function withDraw(
