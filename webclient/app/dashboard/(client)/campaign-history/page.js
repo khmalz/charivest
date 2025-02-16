@@ -40,13 +40,12 @@ export default function DashboardCampaignHistory() {
 
             events.map(event => {
                if (event.args?.length >= 4) {
-                  const [id, title, donor, amount, donation_at] = event.args;
+                  const [campaignId, title, _, amount, donation_at] = event.args;
                   campaignHistory.push({
-                     id,
+                     id: campaignId,
                      title,
                      amount: ethers.formatEther(amount),
                      donation_at: Number(donation_at) * 1000,
-                     address: donor,
                   });
                }
             });
@@ -70,7 +69,7 @@ export default function DashboardCampaignHistory() {
             <div className="mt-5 grid grid-cols-1 gap-4 w-full sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
                {campaigns.map((item, index) => (
                   <Card theme={cardThemeClient} key={index}>
-                     <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{item.id}</h5>
+                     <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{item.title}</h5>
                      <div className="flex w-full items-center gap-x-3">
                         <div className="flex items-center gap-x-2">
                            <CalendarIcon className="w-5 h-5" />

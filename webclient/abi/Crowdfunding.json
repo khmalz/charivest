@@ -66,6 +66,12 @@
                "type": "bytes32"
             },
             {
+               "indexed": false,
+               "internalType": "string",
+               "name": "title",
+               "type": "string"
+            },
+            {
                "indexed": true,
                "internalType": "address",
                "name": "donor",
