@@ -40,6 +40,7 @@ contract Crowdfunding {
     event CampaignCreated(bytes32 campaignId, address indexed creator);
     event DonationReceived(
         bytes32 campaignId,
+        string title,
         address indexed donor,
         uint256 amount,
         uint256 donation_at
@@ -126,6 +127,7 @@ contract Crowdfunding {
         emit RewardPointsGranted(msg.sender, points);
         emit DonationReceived(
             campaignId,
+            campaign.title,
             msg.sender,
             msg.value,
             block.timestamp
