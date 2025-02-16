@@ -26,7 +26,7 @@ export default function DashboardCampaignHistory() {
 
             if (!contract) return;
 
-            const filter = contract.filters.DonationReceived(null, walletAddress, null, null);
+            const filter = contract.filters.DonationReceived(null, null, walletAddress, null, null);
             const events = await contract.queryFilter(filter);
 
             if (events.length === 0) return;
