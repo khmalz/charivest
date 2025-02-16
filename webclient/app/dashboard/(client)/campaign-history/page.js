@@ -1,58 +1,63 @@
+"use client";
+
 import { cardThemeClient } from "@/helpers/theme/flowbiteTheme";
+import { initializeContract } from "@/utils/contractUtils";
+import { ethers } from "ethers";
 import { Card } from "flowbite-react";
 import { BanknoteIcon, CalendarIcon, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function DashboardCampaignHistory() {
-   const campaigns = [
-      {
-         id: 1,
-         title: "Campaign 1",
-         fund: 500,
-         anonim: true,
-      },
-      {
-         id: 2,
-         title: "Campaign 2",
-         fund: 600,
-         anonim: true,
-      },
-      {
-         id: 3,
-         title: "Campaign 3",
-         fund: 200,
-         anonim: false,
-      },
-      {
-         id: 4,
-         title: "Campaign 4",
-         fund: 600,
-         anonim: false,
-      },
-      {
-         id: 5,
-         title: "Campaign 5",
-         fund: 200,
-         anonim: true,
-      },
-      {
-         id: 6,
-         title: "Campaign 6",
-         fund: 600,
-         anonim: false,
-      },
-      {
-         id: 7,
-         title: "Campaign 7",
-         fund: 200,
-         anonim: true,
-      },
-      {
-         id: 8,
-         title: "Campaign 8",
-         fund: 600,
-         anonim: true,
-      },
-   ];
+   const [campaigns, setCampaigns] = useState([]);
+
+   useEffect(() => {
+      const walletAddress = localStorage.getItem("walletAddress");
+      if (!walletAddress) return;
+
+      const getHistoryCampagins = async () => {
+         if (!window.ethereum) {
+            alert("MetaMask is not installed. Please install it to use this feature.");
+            setIsConnected(false);
+            return;
+         }
+
+         try {
+            const { contract } = await initializeContract();
+
+            if (!contract) return;
+
+            const filter = contract.filters.DonationReceived(null, walletAddress, null, null);
+            const events = await contract.queryFilter(filter);
+
+            if (events.length === 0) return;
+
+            const campaignHistory = [];
+
+            if (events.length == 0) {
+               setCampaigns(campaignHistory);
+               return;
+            }
+
+            events.map(event => {
+               if (event.args?.length >= 4) {
+                  const [id, title, donor, amount, donation_at] = event.args;
+                  campaignHistory.push({
+                     id,
+                     title,
+                     amount: ethers.formatEther(amount),
+                     donation_at: Number(donation_at) * 1000,
+                     address: donor,
+                  });
+               }
+            });
+            setCampaigns(campaignHistory);
+         } catch (error) {
+            console.info(error);
+         }
+      };
+
+      getHistoryCampagins();
+   }, []);
 
    return (
       <div>
@@ -63,17 +68,17 @@ export default function DashboardCampaignHistory() {
 
          <div className="flex w-full">
             <div className="mt-5 grid grid-cols-1 gap-4 w-full sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-               {campaigns.map(item => (
-                  <Card theme={cardThemeClient} key={item.id}>
-                     <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{item.title}</h5>
+               {campaigns.map((item, index) => (
+                  <Card theme={cardThemeClient} key={index}>
+                     <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{item.id}</h5>
                      <div className="flex w-full items-center gap-x-3">
                         <div className="flex items-center gap-x-2">
                            <CalendarIcon className="w-5 h-5" />
-                           <span className="text-sm">21/08/2024</span>
+                           <span className="text-sm">{new Date(item.donation_at).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric" })}</span>
                         </div>
                         <div className="flex items-center gap-x-2">
                            <BanknoteIcon className="w-5 h-5" />
-                           <span className="text-sm">${item.fund}</span>
+                           <span className="text-sm">{item.amount} ETH</span>
                         </div>
                      </div>
                      <div>
