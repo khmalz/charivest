@@ -6,51 +6,70 @@ import "./RewardPointsLib.sol";
 contract Crowdfunding {
     using RewardPointsLib for uint256;
 
-    address public admin;
+    // admin = creator
+    address payable public admin;
 
     struct Campaign {
+        bytes32 id;
         address creator;
         string title;
         string description;
         uint256 totalTarget;
         uint256 totalFunds;
         bool isCompleted;
+        bool isWithdrawn;
         uint256 deadline;
         string proofOfFundUse;
         bool proofSubmitted;
         address[] donors;
         string[] photos;
+        uint256 createdAt;
     }
 
-    mapping(uint256 => Campaign) private campaigns;
+    mapping(bytes32 => Campaign) private campaigns;
+    bytes32[] private campaignIds;
+    bytes32[] private hasWithdrawn;
+
     mapping(address => uint256) private rewardPoints;
     mapping(address => uint256) public totalDonations;
-    mapping(uint256 => mapping(address => bool)) private hasDonated;
+    mapping(bytes32 => mapping(address => bool)) private hasDonated;
 
     uint256 public campaignCount;
     uint256 public constant PROOF_DEADLINE = 30 days;
 
-    event CampaignCreated(uint256 campaignId, address indexed creator);
+    event CampaignCreated(bytes32 campaignId, address indexed creator);
     event DonationReceived(
-        uint256 campaignId,
+        bytes32 campaignId,
         address indexed donor,
-        uint256 amount
+        uint256 amount,
+        uint256 donation_at
     );
-    event CampaignCompleted(uint256 campaignId);
-    event ProofSubmitted(uint256 campaignId, string proofOfFundUse);
-    event PhotoAdded(uint256 campaignId, string photoURL);
+    event CampaignCompleted(bytes32 campaignId);
+    event CampaignWithdrawn(bytes32 campaignId, uint256 amount);
+    event ProofSubmitted(bytes32 campaignId, string proofOfFundUse);
     event RewardPointsGranted(address indexed donor, uint256 points);
-
-    constructor() {
-        admin = msg.sender;
-    }
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only admin can create campaigns");
         _;
     }
 
+    modifier onlyCreator(bytes32 id) {
+        require(msg.sender == campaigns[id].creator, "Only creator");
+        _;
+    }
+
+    modifier campaignExists(bytes32 id) {
+        require(campaigns[id].creator != address(0), "Campaign not found");
+        _;
+    }
+
+    constructor() {
+        admin = payable(msg.sender);
+    }
+
     function createCampaign(
+        bytes32 id,
         string memory title,
         string memory description,
         uint256 totalTarget,
@@ -62,21 +81,25 @@ contract Crowdfunding {
         require(totalTarget > 0, "Target must be greater than zero");
         require(deadline > block.timestamp, "Deadline must be in the future");
 
-        Campaign storage newCampaign = campaigns[campaignCount];
+        Campaign storage newCampaign = campaigns[id];
+        newCampaign.id = id;
         newCampaign.creator = msg.sender;
         newCampaign.title = title;
         newCampaign.description = description;
         newCampaign.totalTarget = totalTarget;
         newCampaign.isCompleted = false;
+        newCampaign.isWithdrawn = false;
         newCampaign.deadline = deadline;
         newCampaign.photos = photos;
 
-        emit CampaignCreated(campaignCount, msg.sender);
+        emit CampaignCreated(id, msg.sender);
+        campaignIds.push(id);
         campaignCount++;
     }
 
-    function donate(uint256 campaignId) public payable {
-        require(campaignId < campaignCount, "Invalid campaign ID");
+    function donate(
+        bytes32 campaignId
+    ) public payable campaignExists(campaignId) {
         require(msg.value > 0, "Donation must be greater than zero");
 
         Campaign storage campaign = campaigns[campaignId];
@@ -101,14 +124,38 @@ contract Crowdfunding {
         rewardPoints[msg.sender] += points;
 
         emit RewardPointsGranted(msg.sender, points);
-        emit DonationReceived(campaignId, msg.sender, msg.value);
+        emit DonationReceived(
+            campaignId,
+            msg.sender,
+            msg.value,
+            block.timestamp
+        );
+    }
+
+    function withDraw(
+        bytes32 campaignId
+    ) public onlyCreator(campaignId) campaignExists(campaignId) {
+        Campaign storage campaign = campaigns[campaignId];
+        require(
+            msg.sender == campaign.creator,
+            "Only campaign creator can withdraw"
+        );
+        require(!campaign.isCompleted, "Campaign must be completed first");
+
+        uint256 amount = campaign.totalFunds;
+        campaign.totalFunds = 0;
+        campaign.isWithdrawn = true;
+
+        admin.transfer(amount);
+
+        hasWithdrawn.push(campaignId);
+        emit CampaignWithdrawn(campaignId, amount);
     }
 
     function submitProofOfFundUse(
-        uint256 campaignId,
+        bytes32 campaignId,
         string memory proofURI
-    ) public {
-        require(campaignId < campaignCount, "Invalid campaign ID");
+    ) public campaignExists(campaignId) {
         Campaign storage campaign = campaigns[campaignId];
         require(
             msg.sender == campaign.creator,
@@ -127,22 +174,6 @@ contract Crowdfunding {
         emit ProofSubmitted(campaignId, proofURI);
     }
 
-    function addPhotoToCampaign(
-        uint256 campaignId,
-        string memory photoURL
-    ) public {
-        require(campaignId < campaignCount, "Invalid campaign ID");
-        Campaign storage campaign = campaigns[campaignId];
-        require(
-            msg.sender == campaign.creator,
-            "Only the creator can add photos"
-        );
-
-        campaign.photos.push(photoURL);
-
-        emit PhotoAdded(campaignId, photoURL);
-    }
-
     function getRewardPoints(address user) public view returns (uint256) {
         return rewardPoints[user];
     }
@@ -150,44 +181,14 @@ contract Crowdfunding {
     function getCampaigns() public view returns (Campaign[] memory) {
         Campaign[] memory allCampaigns = new Campaign[](campaignCount);
         for (uint256 i = 0; i < campaignCount; i++) {
-            allCampaigns[i] = campaigns[i];
+            allCampaigns[i] = campaigns[campaignIds[i]];
         }
         return allCampaigns;
     }
 
     function getDetailCampaign(
-        uint256 campaignId
-    )
-        public
-        view
-        returns (
-            address creator,
-            string memory title,
-            string memory description,
-            uint256 totalTarget,
-            uint256 totalFunds,
-            bool isCompleted,
-            uint256 deadline,
-            string memory proofOfFundUse,
-            bool proofSubmitted,
-            address[] memory donors,
-            string[] memory photos
-        )
-    {
-        require(campaignId < campaignCount, "Invalid campaign ID");
-        Campaign storage campaign = campaigns[campaignId];
-        return (
-            campaign.creator,
-            campaign.title,
-            campaign.description,
-            campaign.totalTarget,
-            campaign.totalFunds,
-            campaign.isCompleted,
-            campaign.deadline,
-            campaign.proofOfFundUse,
-            campaign.proofSubmitted,
-            campaign.donors,
-            campaign.photos
-        );
+        bytes32 campaignId
+    ) public view campaignExists(campaignId) returns (Campaign memory) {
+        return campaigns[campaignId];
     }
 }
