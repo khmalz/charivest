@@ -10,9 +10,9 @@
          "inputs": [
             {
                "indexed": false,
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             }
          ],
          "name": "CampaignCompleted",
@@ -23,9 +23,9 @@
          "inputs": [
             {
                "indexed": false,
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             },
             {
                "indexed": true,
@@ -42,9 +42,28 @@
          "inputs": [
             {
                "indexed": false,
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
+               "type": "bytes32"
+            },
+            {
+               "indexed": false,
+               "internalType": "uint256",
+               "name": "amount",
                "type": "uint256"
+            }
+         ],
+         "name": "CampaignWithdrawn",
+         "type": "event"
+      },
+      {
+         "anonymous": false,
+         "inputs": [
+            {
+               "indexed": false,
+               "internalType": "bytes32",
+               "name": "campaignId",
+               "type": "bytes32"
             },
             {
                "indexed": true,
@@ -57,6 +76,12 @@
                "internalType": "uint256",
                "name": "amount",
                "type": "uint256"
+            },
+            {
+               "indexed": false,
+               "internalType": "uint256",
+               "name": "donation_at",
+               "type": "uint256"
             }
          ],
          "name": "DonationReceived",
@@ -67,28 +92,9 @@
          "inputs": [
             {
                "indexed": false,
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
-            },
-            {
-               "indexed": false,
-               "internalType": "string",
-               "name": "photoURL",
-               "type": "string"
-            }
-         ],
-         "name": "PhotoAdded",
-         "type": "event"
-      },
-      {
-         "anonymous": false,
-         "inputs": [
-            {
-               "indexed": false,
-               "internalType": "uint256",
-               "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             },
             {
                "indexed": false,
@@ -133,29 +139,11 @@
          "type": "function"
       },
       {
-         "inputs": [
-            {
-               "internalType": "uint256",
-               "name": "campaignId",
-               "type": "uint256"
-            },
-            {
-               "internalType": "string",
-               "name": "photoURL",
-               "type": "string"
-            }
-         ],
-         "name": "addPhotoToCampaign",
-         "outputs": [],
-         "stateMutability": "nonpayable",
-         "type": "function"
-      },
-      {
          "inputs": [],
          "name": "admin",
          "outputs": [
             {
-               "internalType": "address",
+               "internalType": "address payable",
                "name": "",
                "type": "address"
             }
@@ -178,6 +166,11 @@
       },
       {
          "inputs": [
+            {
+               "internalType": "bytes32",
+               "name": "id",
+               "type": "bytes32"
+            },
             {
                "internalType": "string",
                "name": "title",
@@ -212,9 +205,9 @@
       {
          "inputs": [
             {
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             }
          ],
          "name": "donate",
@@ -228,6 +221,11 @@
          "outputs": [
             {
                "components": [
+                  {
+                     "internalType": "bytes32",
+                     "name": "id",
+                     "type": "bytes32"
+                  },
                   {
                      "internalType": "address",
                      "name": "creator",
@@ -259,6 +257,11 @@
                      "type": "bool"
                   },
                   {
+                     "internalType": "bool",
+                     "name": "isWithdrawn",
+                     "type": "bool"
+                  },
+                  {
                      "internalType": "uint256",
                      "name": "deadline",
                      "type": "uint256"
@@ -282,6 +285,11 @@
                      "internalType": "string[]",
                      "name": "photos",
                      "type": "string[]"
+                  },
+                  {
+                     "internalType": "uint256",
+                     "name": "createdAt",
+                     "type": "uint256"
                   }
                ],
                "internalType": "struct Crowdfunding.Campaign[]",
@@ -295,67 +303,89 @@
       {
          "inputs": [
             {
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             }
          ],
          "name": "getDetailCampaign",
          "outputs": [
             {
-               "internalType": "address",
-               "name": "creator",
-               "type": "address"
-            },
-            {
-               "internalType": "string",
-               "name": "title",
-               "type": "string"
-            },
-            {
-               "internalType": "string",
-               "name": "description",
-               "type": "string"
-            },
-            {
-               "internalType": "uint256",
-               "name": "totalTarget",
-               "type": "uint256"
-            },
-            {
-               "internalType": "uint256",
-               "name": "totalFunds",
-               "type": "uint256"
-            },
-            {
-               "internalType": "bool",
-               "name": "isCompleted",
-               "type": "bool"
-            },
-            {
-               "internalType": "uint256",
-               "name": "deadline",
-               "type": "uint256"
-            },
-            {
-               "internalType": "string",
-               "name": "proofOfFundUse",
-               "type": "string"
-            },
-            {
-               "internalType": "bool",
-               "name": "proofSubmitted",
-               "type": "bool"
-            },
-            {
-               "internalType": "address[]",
-               "name": "donors",
-               "type": "address[]"
-            },
-            {
-               "internalType": "string[]",
-               "name": "photos",
-               "type": "string[]"
+               "components": [
+                  {
+                     "internalType": "bytes32",
+                     "name": "id",
+                     "type": "bytes32"
+                  },
+                  {
+                     "internalType": "address",
+                     "name": "creator",
+                     "type": "address"
+                  },
+                  {
+                     "internalType": "string",
+                     "name": "title",
+                     "type": "string"
+                  },
+                  {
+                     "internalType": "string",
+                     "name": "description",
+                     "type": "string"
+                  },
+                  {
+                     "internalType": "uint256",
+                     "name": "totalTarget",
+                     "type": "uint256"
+                  },
+                  {
+                     "internalType": "uint256",
+                     "name": "totalFunds",
+                     "type": "uint256"
+                  },
+                  {
+                     "internalType": "bool",
+                     "name": "isCompleted",
+                     "type": "bool"
+                  },
+                  {
+                     "internalType": "bool",
+                     "name": "isWithdrawn",
+                     "type": "bool"
+                  },
+                  {
+                     "internalType": "uint256",
+                     "name": "deadline",
+                     "type": "uint256"
+                  },
+                  {
+                     "internalType": "string",
+                     "name": "proofOfFundUse",
+                     "type": "string"
+                  },
+                  {
+                     "internalType": "bool",
+                     "name": "proofSubmitted",
+                     "type": "bool"
+                  },
+                  {
+                     "internalType": "address[]",
+                     "name": "donors",
+                     "type": "address[]"
+                  },
+                  {
+                     "internalType": "string[]",
+                     "name": "photos",
+                     "type": "string[]"
+                  },
+                  {
+                     "internalType": "uint256",
+                     "name": "createdAt",
+                     "type": "uint256"
+                  }
+               ],
+               "internalType": "struct Crowdfunding.Campaign",
+               "name": "",
+               "type": "tuple"
             }
          ],
          "stateMutability": "view",
@@ -383,9 +413,9 @@
       {
          "inputs": [
             {
-               "internalType": "uint256",
+               "internalType": "bytes32",
                "name": "campaignId",
-               "type": "uint256"
+               "type": "bytes32"
             },
             {
                "internalType": "string",
@@ -415,6 +445,19 @@
             }
          ],
          "stateMutability": "view",
+         "type": "function"
+      },
+      {
+         "inputs": [
+            {
+               "internalType": "bytes32",
+               "name": "campaignId",
+               "type": "bytes32"
+            }
+         ],
+         "name": "withDraw",
+         "outputs": [],
+         "stateMutability": "nonpayable",
          "type": "function"
       }
    ]
