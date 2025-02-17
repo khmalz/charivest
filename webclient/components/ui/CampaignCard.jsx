@@ -3,7 +3,7 @@ import { BadgeDollarSign } from "lucide-react";
 import Link from "next/link";
 import { Button, Progress } from "flowbite-react";
 
-export default function CampaignCard({ item, onAdmin }) {
+export default function CampaignCard({ item, onAdmin, buttonLoading, withdrawnFunc }) {
    return (
       <div className="group flex max-w-md flex-col justify-between overflow-hidden rounded-lg dark:bg-slate-700 dark:shadow shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-102">
          <div>
@@ -41,7 +41,7 @@ export default function CampaignCard({ item, onAdmin }) {
                <p className="text-sm text-slate-500 dark:text-blue-200">{new Date(item.deadline).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}</p>
                {onAdmin ? (
                   item.completed && (
-                     <Button size="xs">
+                     <Button size="xs" isProcessing={buttonLoading} onClick={withdrawnFunc}>
                         <div className="flex items-center justify-center">Withdraw</div>
                      </Button>
                   )
