@@ -89,7 +89,7 @@ describe("Crowdfunding Contract", function () {
 
       await crowdfunding.createCampaign(id, "Test", "Test", totalTarget, deadline, photos);
 
-      const donationAmount = ethers.parseEther("0.5");
+      const donationAmount = ethers.parseEther("1.0");
       await crowdfunding.connect(addr1).donate(id, { value: donationAmount });
 
       await crowdfunding.connect(deployer).withDraw(id);
