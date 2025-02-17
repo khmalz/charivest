@@ -22,7 +22,7 @@ export default function CampaignCard({ item, onAdmin, buttonLoading, withdrawnFu
                <h5 className={`${onAdmin ? "text-lg" : "text-2xl"} font-bold capitalize text-slate-900 tracking-tight dark:text-slate-200`}>{item.title}</h5>
                <div className="md:my-3 my-2">
                   <span className="mr-2 inline-flex cursor-pointer items-center rounded-full bg-primary text-white dark:bg-gray-100 px-2.5 py-0.5 text-xs font-medium dark:text-gray-800 hover:bg-gray-200/90">
-                     {item.completed ? "Completed" : "Active"}
+                     {item.completed ? "Completed" : "Active"} {item.withDrawn && "| Withdrawn"}
                   </span>
                </div>
                <p className={`${onAdmin ? "text-xs md:text-sm" : "text-sm md:text-base"} font-normal dark:text-slate-200 text-slate-900 mb-5`}>{item.description}</p>
@@ -41,7 +41,7 @@ export default function CampaignCard({ item, onAdmin, buttonLoading, withdrawnFu
                <p className="text-sm text-slate-500 dark:text-blue-200">{new Date(item.deadline).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}</p>
                {onAdmin ? (
                   item.completed && (
-                     <Button size="xs" isProcessing={buttonLoading} onClick={withdrawnFunc}>
+                     <Button size="xs" disabled={item.withDrawn} isProcessing={buttonLoading} onClick={withdrawnFunc}>
                         <div className="flex items-center justify-center">Withdraw</div>
                      </Button>
                   )

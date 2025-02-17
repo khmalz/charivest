@@ -41,6 +41,7 @@ export default function CampaignListAdmin() {
                creator: campaign.creator,
                title: campaign.title,
                completed: campaign.isCompleted ? true : false,
+               withDrawn: campaign.isWithdrawn ? true : false,
                description: campaign.description,
                totalFunds: ethers.formatEther(campaign.totalFunds),
                totalTarget: ethers.formatEther(campaign.totalTarget),
@@ -109,8 +110,8 @@ export default function CampaignListAdmin() {
                                  </div>
                               ) : (
                                  <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {campaigns.active.concat(campaigns.completed).map((item, index) => (
-                                       <CampaignCard key={index} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
+                                    {campaigns.active.concat(campaigns.completed).map(item => (
+                                       <CampaignCard key={item.id} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
                                     ))}
                                  </div>
                               )}
@@ -123,8 +124,8 @@ export default function CampaignListAdmin() {
                               </div>
                            ) : (
                               <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                 {campaigns.active.map((item, index) => (
-                                    <CampaignCard key={index} item={item} onAdmin={true} />
+                                 {campaigns.active.map(item => (
+                                    <CampaignCard key={item.id} item={item} onAdmin={true} />
                                  ))}
                               </div>
                            )}
@@ -136,8 +137,8 @@ export default function CampaignListAdmin() {
                               </div>
                            ) : (
                               <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                 {campaigns.completed.map((item, index) => (
-                                    <CampaignCard key={index} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
+                                 {campaigns.completed.map(item => (
+                                    <CampaignCard key={item.id} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
                                  ))}
                               </div>
                            )}
