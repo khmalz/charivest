@@ -13,6 +13,7 @@ export default function CampaignListAdmin() {
       completed: [],
    });
    const [isConnected, setIsConnected] = useState(true);
+   const [isLoading, setIsLoading] = useState(false);
 
    const getCampaigns = async () => {
       if (!window.ethereum) {
@@ -36,8 +37,11 @@ export default function CampaignListAdmin() {
             }
 
             const formattedData = campaignsData.map(campaign => ({
+               id: campaign.id,
+               creator: campaign.creator,
                title: campaign.title,
-               completed: campaign.isCompleted,
+               completed: campaign.isCompleted ? true : false,
+               withDrawn: campaign.isWithdrawn ? true : false,
                description: campaign.description,
                totalFunds: ethers.formatEther(campaign.totalFunds),
                totalTarget: ethers.formatEther(campaign.totalTarget),
@@ -52,6 +56,38 @@ export default function CampaignListAdmin() {
          }
       } catch (error) {
          console.info("Error getting contract balance:", error);
+      }
+   };
+
+   const withdraw = async (id, creator) => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
+      try {
+         setIsLoading(true);
+
+         const { contract, signer } = await initializeContract();
+
+         if (contract) {
+            setIsLoading(true);
+
+            if (signer.address !== creator) {
+               alert("You are not the creator of this campaign");
+               return;
+            }
+
+            const tx = await contract.withDraw(id);
+            await tx.wait();
+
+            getCampaigns();
+            console.log("Contract successfully withdrawn");
+         }
+      } catch (error) {
+         console.error("Error to withdraw the contract balance:", error);
+      } finally {
+         setIsLoading(false);
       }
    };
 
@@ -74,8 +110,8 @@ export default function CampaignListAdmin() {
                                  </div>
                               ) : (
                                  <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {campaigns.active.concat(campaigns.completed).map((item, index) => (
-                                       <CampaignCard key={index} item={item} onAdmin={true} />
+                                    {campaigns.active.concat(campaigns.completed).map(item => (
+                                       <CampaignCard key={item.id} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
                                     ))}
                                  </div>
                               )}
@@ -88,8 +124,8 @@ export default function CampaignListAdmin() {
                               </div>
                            ) : (
                               <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                 {campaigns.active.map((item, index) => (
-                                    <CampaignCard key={index} item={item} onAdmin={true} />
+                                 {campaigns.active.map(item => (
+                                    <CampaignCard key={item.id} item={item} onAdmin={true} />
                                  ))}
                               </div>
                            )}
@@ -101,8 +137,8 @@ export default function CampaignListAdmin() {
                               </div>
                            ) : (
                               <div className="mt-5 grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                 {campaigns.completed.map((item, index) => (
-                                    <CampaignCard key={index} item={item} onAdmin={true} />
+                                 {campaigns.completed.map(item => (
+                                    <CampaignCard key={item.id} item={item} onAdmin={true} buttonLoading={isLoading} withdrawnFunc={() => withdraw(item.id, item.creator)} />
                                  ))}
                               </div>
                            )}

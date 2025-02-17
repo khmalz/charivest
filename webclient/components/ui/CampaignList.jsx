@@ -31,7 +31,7 @@ export default function CampaignList({ take, onlyActive }) {
          if (contract) {
             const campaignsData = await contract.getCampaigns();
 
-            if (!campaignsData) {
+            if (campaignsData.length === 0) {
                setCampaigns({
                   active: [],
                   completed: [],
@@ -42,6 +42,7 @@ export default function CampaignList({ take, onlyActive }) {
             const filteredData = onlyActive ? campaignsData.filter(campaign => !campaign.isCompleted) : campaignsData;
 
             const formattedData = filteredData.slice(0, take ? take : filteredData.length).map(campaign => ({
+               id: campaign.id,
                creator: campaign.creator,
                title: campaign.title,
                completed: campaign.isCompleted,
@@ -52,7 +53,10 @@ export default function CampaignList({ take, onlyActive }) {
                photos: campaign.photos,
             }));
 
-            setCampaigns(formattedData);
+            setCampaigns({
+               active: formattedData.filter(c => !c.completed),
+               completed: formattedData.filter(c => c.completed),
+            });
          }
       } catch (error) {
          console.info("Error getting contract balance:", error);

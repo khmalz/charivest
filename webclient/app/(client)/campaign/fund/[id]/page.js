@@ -53,34 +53,35 @@ export default function FundCampaign() {
       } else setIsConnected(true);
    }, []);
 
+   const getDetailCampaign = async () => {
+      if (!window.ethereum) {
+         alert("MetaMask is not installed. Please install it to use this feature.");
+         return;
+      }
+
+      const { contract } = await initializeContract();
+
+      if (contract) {
+         const campaignDetail = await contract.getDetailCampaign(id);
+
+         if (campaignDetail) {
+            const campaignData = {
+               creator: campaignDetail.creator,
+               title: campaignDetail.title,
+               completed: campaignDetail.isCompleted,
+               totalTarget: ethers.formatEther(campaignDetail.totalTarget),
+               totalFunds: ethers.formatEther(campaignDetail.totalFunds),
+            };
+
+            setCampaign(campaignData);
+         }
+      }
+   };
+
    useEffect(() => {
-      const getDetailCampaign = async () => {
-         if (!window.ethereum) {
-            alert("MetaMask is not installed. Please install it to use this feature.");
-            return;
-         }
-
-         const { contract } = await initializeContract();
-
-         if (contract) {
-            const campaignDetail = await contract.getDetailCampaign(id);
-
-            if (campaignDetail) {
-               const campaignData = {
-                  creator: campaignDetail.creator,
-                  title: campaignDetail.title,
-                  completed: campaignDetail.isCompleted,
-                  totalTarget: ethers.formatEther(campaignDetail.totalTarget),
-                  totalFunds: ethers.formatEther(campaignDetail.totalFunds),
-               };
-
-               setCampaign(campaignData);
-            }
-         }
-      };
-
       getDetailCampaign();
-   }, [id]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    return (
       <section id="fund" className="mt-5">

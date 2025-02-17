@@ -29,7 +29,8 @@
       "react-dropzone": "^14.3.5",
       "sqlite": "^5.1.1",
       "sqlite3": "^5.1.7",
-      "tailwindcss-animate": "^1.0.7"
+      "tailwindcss-animate": "^1.0.7",
+      "uuid": "^11.0.5"
    },
    "devDependencies": {
       "@eslint/eslintrc": "^3",

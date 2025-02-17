@@ -4,6 +4,7 @@ import { datepickerTheme } from "@/helpers/theme/flowbiteTheme";
 import { DropzoneInput } from "@/components/ui/DropzoneInput";
 import { initializeContract } from "@/utils/contractUtils";
 import { ethers } from "ethers";
+import { v4 as uuidv4 } from "uuid";
 import { Button, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { DollarSignIcon, X } from "lucide-react";
 import Image from "next/image";
@@ -53,6 +54,10 @@ export default function CreateCampaignForm() {
 
          const formData = new FormData(e.target);
 
+         const uuid = uuidv4();
+         const campaignId = ethers.keccak256(ethers.toUtf8Bytes(uuid));
+
+         campaignData.id = campaignId;
          campaignData.title = formData.get("title");
          campaignData.description = formData.get("description");
          campaignData.totalTarget = ethers.parseEther(formData.get("amount"));
@@ -69,7 +74,7 @@ export default function CreateCampaignForm() {
          const { contract } = await initializeContract();
 
          if (contract) {
-            const txCampaign = await contract.createCampaign(campaignData.title, campaignData.description, campaignData.totalTarget, campaignData.deadline, campaignData.photos);
+            const txCampaign = await contract.createCampaign(campaignData.id, campaignData.title, campaignData.description, campaignData.totalTarget, campaignData.deadline, campaignData.photos);
             await txCampaign.wait();
 
             console.log("Campaign created");

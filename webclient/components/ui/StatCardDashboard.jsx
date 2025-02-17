@@ -37,8 +37,8 @@ export default function StatCardDashboard() {
 
          if (events.length > 0) {
             events.forEach(event => {
-               if (event.args?.length >= 3) {
-                  const [, donor, amount] = event.args;
+               if (event.args?.length >= 5) {
+                  const [, _, donor, amount] = event.args;
                   donorsSet.add(donor);
                   totalAmount += BigInt(amount);
                }
