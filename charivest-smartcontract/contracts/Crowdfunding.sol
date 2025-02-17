@@ -138,11 +138,7 @@ contract Crowdfunding {
         bytes32 campaignId
     ) public onlyCreator(campaignId) campaignExists(campaignId) {
         Campaign storage campaign = campaigns[campaignId];
-        require(
-            msg.sender == campaign.creator,
-            "Only campaign creator can withdraw"
-        );
-        require(!campaign.isCompleted, "Campaign must be completed first");
+        require(campaign.isCompleted, "Campaign must be completed first");
 
         uint256 amount = campaign.totalFunds;
         campaign.totalFunds = 0;
