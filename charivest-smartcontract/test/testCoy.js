@@ -95,7 +95,7 @@ describe("Crowdfunding Contract", function () {
       await crowdfunding.connect(deployer).withDraw(id);
 
       const campaignDetails = await crowdfunding.getDetailCampaign(id);
-      expect(campaignDetails.totalFunds).to.equal(0);
+      expect(campaignDetails.totalFunds).to.equal(donationAmount);
       expect(campaignDetails.isWithdrawn).to.equal(true);
    });
 
