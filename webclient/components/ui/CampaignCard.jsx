@@ -22,7 +22,7 @@ export default function CampaignCard({ item, onAdmin, buttonLoading, withdrawnFu
                <h5 className={`${onAdmin ? "text-lg" : "text-2xl"} font-bold capitalize text-slate-900 tracking-tight dark:text-slate-200`}>{item.title}</h5>
                <div className="md:my-3 my-2">
                   <span className="mr-2 inline-flex cursor-pointer items-center rounded-full bg-primary text-white dark:bg-gray-100 px-2.5 py-0.5 text-xs font-medium dark:text-gray-800 hover:bg-gray-200/90">
-                     {item.completed ? "Completed" : "Active"} {item.withDrawn && "| Withdrawn"}
+                     {item.completed ? "Completed" : "Active"} {onAdmin && item.withDrawn && "| Withdrawn"}
                   </span>
                </div>
                <p className={`${onAdmin ? "text-xs md:text-sm" : "text-sm md:text-base"} font-normal dark:text-slate-200 text-slate-900 mb-5`}>{item.description}</p>
