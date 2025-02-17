@@ -141,7 +141,6 @@ contract Crowdfunding {
         require(campaign.isCompleted, "Campaign must be completed first");
 
         uint256 amount = campaign.totalFunds;
-        campaign.totalFunds = 0;
         campaign.isWithdrawn = true;
 
         admin.transfer(amount);
