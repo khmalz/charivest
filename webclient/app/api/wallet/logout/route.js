@@ -7,7 +7,7 @@ export async function POST() {
       const session = await verifySession();
 
       if (!session.isAuth) {
-         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+         return NextResponse.json({ message: "Unauthorized" }, { status: 200 });
       }
 
       await deleteSession();
