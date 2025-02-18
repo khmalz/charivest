@@ -1,7 +1,7 @@
 "use client";
 
 import { datepickerTheme } from "@/helpers/theme/flowbiteTheme";
-import { DropzoneInput } from "@/components/ui/DropzoneInput";
+import { DropzoneInput } from "@/app/_components/ui/DropzoneInput";
 import { initializeContract } from "@/utils/contractUtils";
 import { ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";

@@ -1,4 +1,4 @@
-import StatCardDashboard from "@/components/ui/StatCardDashboard";
+import StatCardDashboard from "@/app/_components/ui/StatCardDashboard";
 
 export default function Dashboard() {
    return (

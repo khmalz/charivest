@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { tableThemeClient } from "../../helpers/theme/flowbiteTheme";
+import { tableThemeClient } from "../../../helpers/theme/flowbiteTheme";
 import { Pagination, Table } from "flowbite-react";
 
 export default function LeaderboardTable({ data }) {

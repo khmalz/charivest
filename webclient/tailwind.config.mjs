@@ -4,7 +4,7 @@ const flowbite = require("flowbite-react/tailwind");
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
    darkMode: ["class"],
-   content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}", flowbite.content()],
+   content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./app/_components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}", flowbite.content()],
    theme: {
       container: {
          center: true,

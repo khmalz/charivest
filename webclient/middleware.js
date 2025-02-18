@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifySession } from "./app/lib/dal";
+import { verifySession } from "@/app/_lib/dal";
 
 const protectedRoutes = ["/dashboard", "/campaign"];
 const publicRoutes = ["/"];

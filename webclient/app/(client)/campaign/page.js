@@ -1,6 +1,6 @@
 "use client";
 
-import CampaignList from "@/components/ui/CampaignList";
+import CampaignList from "@/app/_components/ui/CampaignList";
 
 export default function Campaign() {
    return (
