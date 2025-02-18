@@ -41,8 +41,14 @@ export async function createSession(address) {
       sameSite: "lax",
       path: "/",
    });
+
+   console.log("Login");
 }
 
 export async function deleteSession() {
-   cookies().delete("session");
+   const cookiesSet = await cookies();
+
+   cookiesSet.delete("session");
+
+   console.log("Logout");
 }

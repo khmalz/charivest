@@ -29,12 +29,26 @@ export default function DrawerDashboard() {
 
    const { push, refresh } = useRouter();
 
-   const disconnect = () => {
+   const disconnect = async () => {
       if (sdk) {
          console.log("Disconnecting from MetaMask...");
          sdk.terminate();
 
          localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
+         try {
+            const response = await fetch("/api/wallet/logout", {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+            });
+
+            if (!response.ok) {
+               console.error("Logout failed:", await response.json());
+            }
+         } catch (error) {
+            console.error("Logout error:", error);
+         }
          setWalletAddress(""), setUsername("");
 
          push("/");
