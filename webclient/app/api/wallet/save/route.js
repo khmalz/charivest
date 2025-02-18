@@ -1,86 +1,69 @@
+import { createSession } from "@/app/lib/session";
 import { openDB } from "@/lib/database";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
-  const { address } = await request.json();
+   const { address } = await request.json();
 
-  if (!address) {
-    return NextResponse.json({ message: "Invalid address" }, { status: 400 });
-  }
+   if (!address) {
+      return NextResponse.json({ message: "Invalid address" }, { status: 400 });
+   }
 
-  try {
-    const db = await openDB();
+   try {
+      const db = await openDB();
 
-    const existingUser = await db.get("SELECT * FROM users WHERE address = ?", [
-      address,
-    ]);
+      const existingUser = await db.get("SELECT * FROM users WHERE address = ?", [address]);
 
-    if (existingUser) {
-      return NextResponse.json(
-        {
-          message: "User already exists",
-          userId: existingUser.id,
-          username: existingUser.username,
-          email: existingUser.email || null,
-          bio: existingUser.bio || null,
-        },
-        { status: 200 }
-      );
-    }
+      if (existingUser) {
+         await createSession(existingUser.address);
 
-    const dummyUsername = `user_${Date.now()}`;
-    await db.run("INSERT INTO users (address, username) VALUES (?, ?)", [
-      address,
-      dummyUsername,
-    ]);
+         return NextResponse.json(
+            {
+               message: "User already exists",
+               userId: existingUser.id,
+               username: existingUser.username,
+               email: existingUser.email || null,
+               bio: existingUser.bio || null,
+            },
+            { status: 200 }
+         );
+      }
 
-    const newUser = await db.get("SELECT * FROM users WHERE address = ?", [
-      address,
-    ]);
+      const dummyUsername = `user_${Date.now()}`;
+      await db.run("INSERT INTO users (address, username) VALUES (?, ?)", [address, dummyUsername]);
 
-    return NextResponse.json(
-      { message: "User created", userId: newUser.id, username: newUser.username },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Database error:", error);
-    return NextResponse.json({ message: "Database error" }, { status: 500 });
-  }
+      const newUser = await db.get("SELECT * FROM users WHERE address = ?", [address]);
+      await createSession(newUser.address);
+
+      return NextResponse.json({ message: "User created", userId: newUser.id, username: newUser.username }, { status: 201 });
+   } catch (error) {
+      console.error("Database error:", error);
+      return NextResponse.json({ message: "Database error" }, { status: 500 });
+   }
 }
 
 export async function PUT(request) {
-  const { address } = await request.json();
-  const { username, email, bio } = request.json();
+   const { address } = await request.json();
+   const { username, email, bio } = request.json();
 
-  if (!address || !username || !email) {
-    return NextResponse.json(
-      { message: "Address, username, and email are required" },
-      { status: 400 }
-    );
-  }
+   if (!address || !username || !email) {
+      return NextResponse.json({ message: "Address, username, and email are required" }, { status: 400 });
+   }
 
-  try {
-    const db = await openDB();
+   try {
+      const db = await openDB();
 
-    const existingUser = await db.get("SELECT * FROM users WHERE address = ?", [
-      address,
-    ]);
+      const existingUser = await db.get("SELECT * FROM users WHERE address = ?", [address]);
 
-    if (!existingUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
+      if (!existingUser) {
+         return NextResponse.json({ message: "User not found" }, { status: 404 });
+      }
 
-    await db.run(
-      "UPDATE users SET username = ?, email = ?, bio = ? WHERE address = ?",
-      [username, email, bio, address]
-    );
+      await db.run("UPDATE users SET username = ?, email = ?, bio = ? WHERE address = ?", [username, email, bio, address]);
 
-    return NextResponse.json(
-      { message: "User profile updated" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Database error:", error);
-    return NextResponse.json({ message: "Database error" }, { status: 500 });
-  }
+      return NextResponse.json({ message: "User profile updated" }, { status: 200 });
+   } catch (error) {
+      console.error("Database error:", error);
+      return NextResponse.json({ message: "Database error" }, { status: 500 });
+   }
 }

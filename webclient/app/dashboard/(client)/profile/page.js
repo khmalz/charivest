@@ -8,12 +8,33 @@ export default function DashboardProfile() {
    const [address, setAddress] = useState("");
    const [loading, setLoading] = useState(false);
 
-   useEffect(() => {
-      const storedName = localStorage.getItem("username");
-      if (storedName) setUsername(storedName);
+   const checkSession = async () => {
+      try {
+         const response = await fetch("/api/auth/session", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            next: { revalidate: 3600 },
+         });
+         const data = await response.json();
 
-      const storedAddress = localStorage.getItem("walletAddress");
-      if (storedAddress) setAddress(storedAddress);
+         if (!data.isAuth) {
+            console.log("User not authenticated");
+            setAddress(""), setUsername("");
+            return;
+         }
+
+         console.log("User authenticated:", data.address);
+         setAddress(data.address);
+
+         const savedUsername = localStorage.getItem("username");
+         if (savedUsername) setUsername(savedUsername);
+      } catch (error) {
+         console.error("Error checking session:", error);
+      }
+   };
+
+   useEffect(() => {
+      checkSession();
    }, []);
 
    const handleRename = async () => {

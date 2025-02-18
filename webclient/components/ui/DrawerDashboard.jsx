@@ -10,31 +10,64 @@ import { useSDK } from "@metamask/sdk-react";
 import { useRouter } from "next/navigation";
 
 export default function DrawerDashboard() {
-   const { sdk } = useSDK();
+   const { sdk, connected } = useSDK();
    const { isOpen, toggleDrawer } = useDrawer();
    const [walletAddress, setWalletAddress] = useState("");
    const [username, setUsername] = useState("");
 
-   useEffect(() => {
-      const savedWalletAddress = localStorage.getItem("walletAddress");
-      const savedUsername = localStorage.getItem("username");
+   const checkSession = async () => {
+      try {
+         const response = await fetch("/api/auth/session", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            next: { revalidate: 3600 },
+         });
+         const data = await response.json();
 
-      if (savedWalletAddress) {
-         setWalletAddress(savedWalletAddress);
+         if (!data.isAuth) {
+            console.log("User not authenticated");
+            setWalletAddress(""), setUsername("");
+            return;
+         }
+
+         console.log("User authenticated:", data.address);
+         setWalletAddress(data.address);
+
+         const savedUsername = localStorage.getItem("username");
+         if (savedUsername) setUsername(savedUsername);
+      } catch (error) {
+         console.error("Error checking session:", error);
       }
-      if (savedUsername) {
-         setUsername(savedUsername);
-      }
+   };
+
+   useEffect(() => {
+      if (!connected) deleteSession();
+
+      checkSession();
    }, []);
 
    const { push, refresh } = useRouter();
 
-   const disconnect = () => {
+   const disconnect = async () => {
       if (sdk) {
          console.log("Disconnecting from MetaMask...");
          sdk.terminate();
 
          localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
+         try {
+            const response = await fetch("/api/wallet/logout", {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+            });
+
+            if (!response.ok) {
+               console.error("Logout failed:", await response.json());
+            }
+         } catch (error) {
+            console.error("Logout error:", error);
+         }
          setWalletAddress(""), setUsername("");
 
          push("/");

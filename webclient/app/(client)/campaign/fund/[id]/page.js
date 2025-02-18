@@ -2,12 +2,13 @@
 
 import { Button, Checkbox, Label, Progress, Radio, TextInput } from "flowbite-react";
 import { DollarSignIcon } from "lucide-react";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { initializeContract } from "@/utils/contractUtils";
 import { progressTheme } from "@/helpers/theme/flowbiteTheme";
 import { ethers } from "ethers";
 import { isAddressNull } from "@/helpers/utils";
+import Loading from "../../loading";
 
 export default function FundCampaign() {
    const { id } = useParams();
@@ -15,6 +16,8 @@ export default function FundCampaign() {
    const [amountValue, setAmountValue] = useState("Other");
    const [campaign, setCampaign] = useState({});
    const [isConnected, setIsConnected] = useState(true);
+   const [error, setError] = useState("");
+   const [loading, setLoading] = useState(true);
 
    const handleRadioChange = e => {
       const value = e.target.value;
@@ -59,12 +62,20 @@ export default function FundCampaign() {
          return;
       }
 
-      const { contract } = await initializeContract();
+      try {
+         const { contract } = await initializeContract();
 
-      if (contract) {
-         const campaignDetail = await contract.getDetailCampaign(id);
+         if (contract) {
+            setLoading(true);
 
-         if (campaignDetail) {
+            const formattedId = ethers.encodeBytes32String(id);
+            const campaignDetail = await contract.getDetailCampaign(formattedId);
+
+            if (!campaignDetail) {
+               alert("Campaign not found!");
+               return;
+            }
+
             const campaignData = {
                creator: campaignDetail.creator,
                title: campaignDetail.title,
@@ -75,6 +86,13 @@ export default function FundCampaign() {
 
             setCampaign(campaignData);
          }
+      } catch (error) {
+         if (error.message.includes("Campaign not found")) {
+            setError("404");
+            return;
+         }
+      } finally {
+         setLoading(false);
       }
    };
 
@@ -82,6 +100,14 @@ export default function FundCampaign() {
       getDetailCampaign();
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
+
+   if (loading) {
+      return <Loading />;
+   }
+
+   if (error === "404") {
+      notFound();
+   }
 
    return (
       <section id="fund" className="mt-5">
