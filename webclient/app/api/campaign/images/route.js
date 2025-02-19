@@ -6,10 +6,10 @@ import mime from "mime";
 export async function POST(req) {
    try {
       const formData = await req.formData();
-      const files = formData.getAll("files");
+      const images = formData.getAll("images");
 
-      if (!files || files.length === 0) {
-         return NextResponse.json({ error: "No files received." }, { status: 400 });
+      if (!images || images.length === 0) {
+         return NextResponse.json({ error: "No images received." }, { status: 400 });
       }
 
       const uploadDir = join(process.cwd(), "public", "uploads");
@@ -24,20 +24,20 @@ export async function POST(req) {
          }
       }
 
-      const fileUrls = [];
+      const imageUrls = [];
 
-      for (const file of files) {
-         const buffer = Buffer.from(await file.arrayBuffer());
+      for (const image of images) {
+         const buffer = Buffer.from(await image.arrayBuffer());
          const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-         const filename = `${uniqueSuffix}.${mime.getExtension(file.type)}`;
+         const imagename = `${uniqueSuffix}.${mime.getExtension(image.type)}`;
 
-         await writeFile(`${uploadDir}/${filename}`, buffer);
-         fileUrls.push(`/uploads/${filename}`);
+         await writeFile(`${uploadDir}/${imagename}`, buffer);
+         imageUrls.push(`/uploads/${imagename}`);
       }
 
-      return NextResponse.json({ uploadedFiles: fileUrls });
+      return NextResponse.json({ uploadedImages: imageUrls });
    } catch (e) {
-      console.error("Error while trying to upload files", e);
+      console.error("Error while trying to upload images", e);
       return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
    }
 }
@@ -51,8 +51,8 @@ export async function DELETE(req) {
       }
 
       for (const url of imageUrls) {
-         const filePath = join(process.cwd(), "public", url);
-         await unlink(filePath);
+         const imagePath = join(process.cwd(), "public", url);
+         await unlink(imagePath);
       }
 
       return NextResponse.json({ success: true }, { status: 200 });
