@@ -15,6 +15,8 @@ export default function Nav() {
    const [error, setError] = useState(null);
 
    const checkSession = async () => {
+      if (connecting && !connected) return;
+
       try {
          const response = await fetch("/api/auth/session", {
             method: "GET",
@@ -41,8 +43,9 @@ export default function Nav() {
    };
 
    useEffect(() => {
-      if (!connected) deleteSession();
       checkSession();
+
+      if (connecting && !connected) deleteSession();
    }, []);
 
    const connect = async () => {

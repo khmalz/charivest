@@ -1,4 +1,4 @@
-import CampaignList from "@/components/ui/CampaignList";
+import CampaignList from "@/app/_components/ui/CampaignList";
 import { Mail, SmartphoneNfc } from "lucide-react";
 
 export default function Home() {

@@ -1,4 +1,4 @@
-import CampaignListAdmin from "@/components/ui/CampaignListAdmin";
+import CampaignListAdmin from "@/app/_components/ui/CampaignListAdmin";
 
 export default function DashboardCampaign() {
    return (

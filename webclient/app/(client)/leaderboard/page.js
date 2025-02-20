@@ -1,4 +1,4 @@
-import LeaderboardTable from "@/components/ui/LeaderboardTable";
+import LeaderboardTable from "@/app/_components/ui/LeaderboardTable";
 
 export default function Leaderboard() {
    return (

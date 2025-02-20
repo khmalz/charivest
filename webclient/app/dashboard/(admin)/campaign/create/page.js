@@ -1,4 +1,4 @@
-import CreateCampaignForm from "@/components/ui/forms/CreateCampaignForm";
+import CreateCampaignForm from "@/app/_components/ui/forms/CreateCampaignForm";
 
 export default function DashboardCreateCampaign() {
    return (

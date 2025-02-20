@@ -1,4 +1,4 @@
-import { createSession } from "@/app/lib/session";
+import { createSession } from "@/app/_lib/session";
 import { openDB } from "@/lib/database";
 import { NextResponse } from "next/server";
 

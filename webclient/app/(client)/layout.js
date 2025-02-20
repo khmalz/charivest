@@ -1,5 +1,5 @@
-import MetaMask from "@/components/ui/MetaMask";
-import Nav from "@/components/ui/Nav";
+import MetaMask from "@/app/_components/ui/MetaMask";
+import Nav from "@/app/_components/ui/Nav";
 
 export default function RootLayout({ children }) {
    return (

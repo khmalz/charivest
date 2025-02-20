@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 export const formatAddress = addr => {
    return `${addr?.substring(0, 15)}...`;
 };
@@ -26,4 +28,13 @@ export const isAddressNull = () => {
 
    const address = getAddress();
    return address === null;
+};
+
+export const isValidBytes32 = id => {
+   try {
+      const bytes = ethers.getBytes(id);
+      return bytes.length === 32;
+   } catch (error) {
+      return false;
+   }
 };

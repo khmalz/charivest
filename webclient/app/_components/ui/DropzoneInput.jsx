@@ -4,21 +4,21 @@ import { useDropzone } from "react-dropzone";
 import { Label } from "flowbite-react";
 import { useCallback } from "react";
 
-export function DropzoneInput({ id, filesLength, setFiles, ...props }) {
+export function DropzoneInput({ id, imagesLength, setImages, ...props }) {
    const onDrop = useCallback(
-      acceptedFiles => {
-         if (acceptedFiles.length > 3 || filesLength + acceptedFiles.length > 3) {
-            alert("Anda hanya bisa meng-upload maksimal 3 file.");
+      acceptedImages => {
+         if (acceptedImages.length > 3 || imagesLength + acceptedImages.length > 3) {
+            alert("Anda hanya bisa meng-upload maksimal 3 image.");
             return;
          }
 
-         const mappedFiles = acceptedFiles.map(file => ({
-            file,
-            preview: URL.createObjectURL(file),
+         const mappedImages = acceptedImages.map(image => ({
+            image,
+            preview: URL.createObjectURL(image),
          }));
-         setFiles(prev => [...prev, ...mappedFiles]);
+         setImages(prev => [...prev, ...mappedImages]);
       },
-      [filesLength]
+      [imagesLength]
    );
 
    const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -50,7 +50,7 @@ export function DropzoneInput({ id, filesLength, setFiles, ...props }) {
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                      <span className="font-semibold">Click to upload</span> or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">SVG, PNG, or JPG (MAX. 3 files)</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">SVG, PNG, or JPG (MAX. 3 images)</p>
                </div>
             </Label>
             <input id={id} {...getInputProps()} {...props} className="hidden" />

@@ -20,11 +20,6 @@ export default function CampaignList({ take, onlyActive }) {
          return;
       }
 
-      if (isAddressNull()) {
-         setIsConnected(false);
-         return;
-      } else setIsConnected(true);
-
       try {
          const { contract } = await initializeContract();
 

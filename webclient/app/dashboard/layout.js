@@ -1,7 +1,7 @@
-import { DrawerProvider } from "@/components/hooks/useDrawer";
-import DrawerDashboard from "@/components/ui/DrawerDashboard";
-import MetaMask from "@/components/ui/MetaMask";
-import { SidebarDashboard } from "@/components/ui/Sidebar";
+import { DrawerProvider } from "@/app/_components/hooks/useDrawer";
+import DrawerDashboard from "@/app/_components/ui/DrawerDashboard";
+import MetaMask from "@/app/_components/ui/MetaMask";
+import { SidebarDashboard } from "@/app/_components/ui/Sidebar";
 
 export default function DashboardLayout({ children }) {
    return (

@@ -10,12 +10,14 @@ import { useSDK } from "@metamask/sdk-react";
 import { useRouter } from "next/navigation";
 
 export default function DrawerDashboard() {
-   const { sdk, connected } = useSDK();
+   const { sdk, connected, connecting } = useSDK();
    const { isOpen, toggleDrawer } = useDrawer();
    const [walletAddress, setWalletAddress] = useState("");
    const [username, setUsername] = useState("");
 
    const checkSession = async () => {
+      if (connecting && !connected) return;
+
       try {
          const response = await fetch("/api/auth/session", {
             method: "GET",
@@ -41,9 +43,9 @@ export default function DrawerDashboard() {
    };
 
    useEffect(() => {
-      if (!connected) deleteSession();
-
       checkSession();
+
+      if (connecting && !connected) deleteSession();
    }, []);
 
    const { push, refresh } = useRouter();
@@ -53,25 +55,29 @@ export default function DrawerDashboard() {
          console.log("Disconnecting from MetaMask...");
          sdk.terminate();
 
-         localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
-         try {
-            const response = await fetch("/api/wallet/logout", {
-               method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-               },
-            });
-
-            if (!response.ok) {
-               console.error("Logout failed:", await response.json());
-            }
-         } catch (error) {
-            console.error("Logout error:", error);
-         }
+         localStorage.removeItem("username");
+         deleteSession();
          setWalletAddress(""), setUsername("");
 
          push("/");
          refresh();
+      }
+   };
+
+   const deleteSession = async () => {
+      try {
+         const response = await fetch("/api/wallet/logout", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+         });
+
+         if (!response.ok) {
+            console.error("Logout failed:", await response.json());
+         }
+      } catch (error) {
+         console.info("Logout error:", error);
       }
    };
 
