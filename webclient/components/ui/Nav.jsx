@@ -14,16 +14,35 @@ export default function Nav() {
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
 
-   useEffect(() => {
-      const savedWalletAddress = localStorage.getItem("walletAddress");
-      const savedUsername = localStorage.getItem("username");
+   const checkSession = async () => {
+      try {
+         const response = await fetch("/api/auth/session", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            next: { revalidate: 3600 },
+         });
 
-      if (savedWalletAddress) {
-         setWalletAddress(savedWalletAddress);
+         const data = await response.json();
+
+         if (!data.isAuth) {
+            console.log("User not authenticated");
+            setWalletAddress(""), setUsername("");
+            return;
+         }
+
+         console.log("User authenticated:", data.address);
+         setWalletAddress(data.address);
+
+         const savedUsername = localStorage.getItem("username");
+         if (savedUsername) setUsername(savedUsername);
+      } catch (error) {
+         console.info("Error checking session:", error);
       }
-      if (savedUsername) {
-         setUsername(savedUsername);
-      }
+   };
+
+   useEffect(() => {
+      if (!connected) deleteSession();
+      checkSession();
    }, []);
 
    const connect = async () => {
@@ -37,34 +56,31 @@ export default function Nav() {
          const accounts = await sdk?.connect();
          const address = accounts?.[0];
 
-         if (address) {
-            setWalletAddress(address);
-            localStorage.setItem("walletAddress", address);
-         }
-
-         if (address) {
-            const response = await fetch("/api/wallet/save", {
-               method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-               },
-               body: JSON.stringify({ address }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-               console.log(data);
-               const fetchedUsername = data?.username || "Dummy User";
-               setUsername(fetchedUsername);
-
-               localStorage.setItem("username", fetchedUsername);
-            } else {
-               setError(data.message || "Unknown error occurred");
-            }
-         } else {
+         if (!address) {
             setError("Failed to connect wallet");
+            return;
          }
+
+         const response = await fetch("/api/wallet/save", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ address }),
+         });
+
+         const data = await response.json();
+
+         if (!response.ok) {
+            setError(data.message || "Unknown error occurred");
+            return;
+         }
+         console.log(data);
+
+         const fetchedUsername = data?.username || "Dummy User";
+         setUsername(fetchedUsername);
+
+         localStorage.setItem("username", fetchedUsername);
       } catch (err) {
          setError("Failed to connect wallet");
          console.error("Failed to connect wallet:", error);
@@ -73,11 +89,30 @@ export default function Nav() {
       }
    };
 
-   const disconnect = () => {
+   const disconnect = async () => {
       if (sdk) {
          sdk.terminate();
-         localStorage.removeItem("walletAddress"), localStorage.removeItem("username");
+         deleteSession();
+         localStorage.removeItem("username");
+
          setWalletAddress(""), setUsername(""), setError(null);
+      }
+   };
+
+   const deleteSession = async () => {
+      try {
+         const response = await fetch("/api/wallet/logout", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+         });
+
+         if (!response.ok) {
+            console.error("Logout failed:", await response.json());
+         }
+      } catch (error) {
+         console.info("Logout error:", error);
       }
    };
 

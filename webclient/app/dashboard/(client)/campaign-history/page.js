@@ -11,7 +11,28 @@ export default function DashboardCampaignHistory() {
    const [campaigns, setCampaigns] = useState([]);
 
    useEffect(() => {
-      const walletAddress = localStorage.getItem("walletAddress");
+      const getAddress = async () => {
+         try {
+            const response = await fetch("/api/auth/session", {
+               method: "GET",
+               headers: { "Content-Type": "application/json" },
+               next: { revalidate: 3600 },
+            });
+            const data = await response.json();
+
+            if (!data.isAuth) {
+               console.log("User not authenticated");
+               return;
+            }
+
+            console.log("User authenticated:", data.address);
+            return data.address;
+         } catch (error) {
+            console.error("Error checking session:", error);
+         }
+      };
+
+      const walletAddress = getAddress();
       if (!walletAddress) return;
 
       const getHistoryCampagins = async () => {
